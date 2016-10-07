@@ -1,0 +1,29 @@
+{
+  "name": "imdb_sna",
+  "version": "1.0.0",
+  "description": "show imdb 2000~2016 movie, actor social network analysis",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DerayGa/IMDb-SNA.git"
+  },
+  "keywords": [
+    "imdb",
+    "sna"
+  ],
+  "author": "Deray",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DerayGa/IMDb-SNA/issues"
+  },
+  "homepage": "https://github.com/DerayGa/IMDb-SNA#readme",
+  "dependencies": {
+    "imdb-api": "^2.1.0"
+  }
+}
