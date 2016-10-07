@@ -3,20 +3,24 @@
 const imdb = require('imdb-api');
 const fs = require('fs');
 const path = require('path');
+const topMovie = require('./movies/top.json');
+
+let targetMovieList = [];
+
+Object.keys(topMovie).forEach((year) => {
+  targetMovieList = targetMovieList.concat(topMovie[year]);
+});
 
 const dir = './movies/';
+const save_movie_to_json = (movieId) => {
+  const existMovieList = fs.readdirSync(dir)
+    .filter((name) => {
+      const filename = path.join(dir, name);
+      const stats = fs.statSync(filename);
 
-const existMovieList = fs.readdirSync(dir)
-  .filter((name) => {
-    const filename = path.join(dir, name);
-    const stats = fs.statSync(filename);
+      return (stats.isFile() && path.extname(filename) === '.json');
+    }).map((name) => (name.replace('.json', '')));
 
-    return (stats.isFile() && path.extname(filename) === '.json');
-  }).map((name) => (name.replace('.json', '')));
-
-const targetMovieList = ['tt3263904'];
-
-targetMovieList.forEach((movieId) => {
   if (existMovieList.indexOf(movieId) > -1) {
     console.log(`${movieId} existed`);
     return;
@@ -31,6 +35,12 @@ targetMovieList.forEach((movieId) => {
         return console.error(err);
       }
       console.log(`${movieId} Saved.`);
+
+      if (targetMovieList.length)
+        save_movie_to_json(targetMovieList.shift())
     });
   });
-});
+}
+
+if (targetMovieList.length)
+  save_movie_to_json(targetMovieList.shift())
