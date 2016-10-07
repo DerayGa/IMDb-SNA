@@ -5,7 +5,9 @@ will get movie id on console
 */
 
 var list = $('div.list.compact > table > tbody > tr.list_item > td.title > a');
+var result = [];
 list.each((index, value) => {
 if(index > 99) return;
-console.log($(value).attr('href').split('/')[2]);
+  result.push($(value).attr('href').split('/')[2]);
 });
+console.log(JSON.stringify(result));
