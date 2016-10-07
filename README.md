@@ -8,9 +8,7 @@ https://www.omdbapi.com/
 
 JSON format
 
-[X] 統一一份JSON，讓不同的SNA分析
-or
-[ ] 不同類型的SNA，使用自己的JSON檔案
+### 統一一份JSON，讓不同的SNA分析
 
 ```
 {
