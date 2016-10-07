@@ -12,6 +12,7 @@ Object.keys(topMovie).forEach((year) => {
 });
 
 const dir = './movies/';
+let num = 1;
 const save_movie_to_json = (movieId) => {
   const existMovieList = fs.readdirSync(dir)
     .filter((name) => {
@@ -22,7 +23,10 @@ const save_movie_to_json = (movieId) => {
     }).map((name) => (name.replace('.json', '')));
 
   if (existMovieList.indexOf(movieId) > -1) {
-    console.log(`${movieId} existed`);
+    console.log(`${movieId} existed ${num}`);
+    num++;
+    if (targetMovieList.length)
+      save_movie_to_json(targetMovieList.shift())
     return;
   }
   imdb.getReq({ id: movieId }, (err, movie) => {
@@ -34,8 +38,8 @@ const save_movie_to_json = (movieId) => {
       if (err) {
         return console.error(err);
       }
-      console.log(`${movieId} Saved.`);
-
+      console.log(`${movieId} Saved. ${num}`);
+      num++;
       if (targetMovieList.length)
         save_movie_to_json(targetMovieList.shift())
     });
