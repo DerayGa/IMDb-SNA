@@ -21,8 +21,13 @@ movies.forEach((movie) => {
 
 allActors.sort();
 
+const result = { actors: [] };
+allActors.forEach((actor) => {
+  result.actors.push({ name: actor, id: '' });
+});
+
 fs.writeFile(`${rootDir}actors.json`,
-  JSON.stringify({ actors: allActors }, null, 2), (err) => {
+  JSON.stringify(result, null, 2), (err) => {
   if (err) {
     return console.error(err);
   }
