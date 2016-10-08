@@ -19,6 +19,8 @@ movies.forEach((movie) => {
   });
 });
 
+allActors.sort();
+
 fs.writeFile(`${rootDir}actors.json`,
   JSON.stringify({ actors: allActors }, null, 2), (err) => {
   if (err) {
