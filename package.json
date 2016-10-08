@@ -25,6 +25,7 @@
   "homepage": "https://github.com/DerayGa/IMDb-SNA#readme",
   "dependencies": {
     "imdb-api": "^2.1.0",
-    "jquery": "^3.1.1"
+    "jsdom": "^9.6.0",
+    "node-fetch": "^1.6.3"
   }
 }
