@@ -16,42 +16,52 @@ const checkCompleted = () => {
       }
       console.log(`allActors with Id Saved.`);
     });
+  } else {
+    idx++;
+    getIdByName(actors[idx]);
   }
 };
 
-actors.forEach((actor, index) => {
-  if(actor.id) {
+const getIdByName = (actor) => {
+  if (actor.id) {
+    console.log(actor.name, ' -> ', actor.id);
     count--;
     checkCompleted();
     return;
   }
-  const url = `http://www.imdb.com/find?q=${actor.name}&s=nm`;
+  //const url = `http://www.imdb.com/find?q=${actor.name}&s=nm`;
+  //const url = `http://m.imdb.com/find?q=${actor.name}`;
+  const url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${actor.name}`;
   fetch(url)
     .then((res) => (
-      res.text()
-    )).then((body) => {
-      jsdom.env(
-        body,
-        ["http://code.jquery.com/jquery.js"],
-        (err, window) => {
-          const $ = window.$
-          const result = $('table.findList > tbody > tr > td.result_text > a');
-          result.each((index, node) => {
-            if($(node).text() == actor.name){
-              actor.id = $(node).attr('href').split('/')[2];
-              return false;
-            }
-          });
-
-          if (actor.id) {
-            console.log('found! ', actor.name, actor.id);
-          } else {
-            console.log('NOT found! ', actor.name, actor.id);
+      res.json()
+    )).then((json) => {
+      if (json.name_exact) {
+        json.name_exact.forEach((obj) => {
+          if (obj.name == actor.name) {
+            actor.id = obj.id;
           }
-          count--;
+        });
+      }
+      if (json.name_approx && !actor.id) {
+        json.name_approx.forEach((obj) => {
+          if (obj.name == actor.name) {
+            actor.id = obj.id;
+          }
+        });
+      }
 
-          checkCompleted();
-        }
-      );
+      if (actor.id) {
+        console.log('found! ', actor.name, actor.id);
+      } else {
+        console.log('NOT found! ', actor.name);
+      }
+      count--;
+
+      checkCompleted();
     });
-});
+};
+
+
+var idx = 0;
+getIdByName(actors[idx]);
