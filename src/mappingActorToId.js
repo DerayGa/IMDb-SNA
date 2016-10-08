@@ -1,6 +1,6 @@
 // http://www.imdb.com/find?q=A.D.%20Miles&s=nm
-const jsdom = require('jsdom');
 const fs = require('fs');
+const jsdom = require('jsdom');
 const fetch = require('node-fetch');
 const actors = require('../movies/actors.json').actors;
 
