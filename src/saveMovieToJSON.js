@@ -3,7 +3,7 @@
 const imdb = require('imdb-api');
 const fs = require('fs');
 const path = require('path');
-const topMovie = require('./movies/top.json');
+const topMovie = require('../movies/top.json');
 
 let targetMovieList = [];
 
