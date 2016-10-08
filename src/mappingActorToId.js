@@ -7,15 +7,19 @@ const actors = require('../movies/actors.json').actors;
 const rootDir = '../movies/';
 var count = actors.length;
 
+const saveToJSON = () => {
+  fs.writeFile(`${rootDir}actors.json`,
+    JSON.stringify({ actors: actors }, null, 2), (err) => {
+    if (err) {
+      return console.error(err);
+    }
+  });
+};
+
 const checkCompleted = () => {
   if( count == 0) {
-    fs.writeFile(`${rootDir}actors.json`,
-      JSON.stringify({ actors: actors }, null, 2), (err) => {
-      if (err) {
-        return console.error(err);
-      }
-      console.log(`allActors with Id Saved.`);
-    });
+    saveToJSON();
+    console.log(`allActors with Id Saved.`);
   } else {
     idx++;
     getIdByName(actors[idx]);
@@ -50,9 +54,18 @@ const getIdByName = (actor) => {
           }
         });
       }
+      if (json.name_popular && !actor.id) {
+        json.name_popular.forEach((obj) => {
+          if (obj.name == actor.name) {
+            actor.id = obj.id;
+          }
+        });
+      }
 
       if (actor.id) {
         console.log('found! ', actor.name, actor.id);
+        
+        saveToJSON();
       } else {
         console.log('NOT found! ', actor.name);
       }
