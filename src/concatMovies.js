@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const rootDir = './movies/';
+const rootDir = '../movies/';
 const dir = rootDir + 'id/';
 
 const movieList = fs.readdirSync(dir)
