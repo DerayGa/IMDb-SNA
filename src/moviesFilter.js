@@ -1,37 +1,44 @@
 "use strict";
 
-const fs = require('fs');
-const path = require('path');
-//const movies = require('./movies/movies.json');
-
-const filterBy = (key) => (value, target) => (
+const filterByKey = (key) => (value, target) => (
   target.filter((movie) => (
     (movie[key].indexOf(value) > -1)
   ))
-)
+);
 
 const filterByYear = (year, target) => (
   target.filter((movie) => (
     (movie.year == year)
   ))
-)
+);
 
 const filterByRating = (rating, target) => (
   target.filter((movie) => (
     (+movie.rating >= rating)
   ))
-)
+);
+const filterByGenre = filterByKey('genres');
+const filterByActor = filterByKey('actors');
+const filterByDirector = filterByKey('director');
 
-const filterByGenres = filterBy('genres');
-const filterByActors = filterBy('actors');
-const filterByDirector = filterBy('director');
+const capitalize = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
-//const result = filterByYear(2002, movies);
-//const result = filterByRating(9, movies);
-//const result = filterByGenres('Sci-Fi', movies);
-//const result = filterByActors('Christian Bale', movies);
-//const result = filterByDirector('Christopher Nolan', movies);
+const filterBy = (condition, target) => {
+  const keys = Object.keys(condition);
+  let result = target;
 
-//console.log(result.length)
+  keys.forEach((key) => {    
+    result = this['filterBy' + capitalize(key)](condition[key], result);
+  });
 
+  return result;
+};
+
+exports.filterBy = filterBy;
 exports.filterByYear = filterByYear;
+exports.filterByRating = filterByRating;
+exports.filterByGenre = filterByGenre;
+exports.filterByActor = filterByActor;
+exports.filterByDirector = filterByDirector;
