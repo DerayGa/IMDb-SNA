@@ -1,7 +1,6 @@
 "use strict";
 
 const fs = require('fs');
-
 const moviesFilter = require('./moviesFilter.js');
 const movies = require('../movies/movies.json');
 
