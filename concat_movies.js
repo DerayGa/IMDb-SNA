@@ -17,8 +17,21 @@ const movieList = fs.readdirSync(dir)
 const allMovies = [];
 movieList.forEach((movieFile, index) => {
   const filename = path.join(dir, movieFile);
-  
-  allMovies.push(JSON.parse(fs.readFileSync(filename, 'utf8')));  
+  const movie = JSON.parse(fs.readFileSync(filename, 'utf8'));
+  /*movie.genres = movie.genres.split(',').map((genre) => (
+    genre.trim()
+  ));
+  movie.actors = movie.actors.split(',').map((actor) => (
+    actor.trim()
+  ));
+  movie.languages = movie.languages.split(',').map((language) => (
+    language.trim()
+  ));
+  movie.country = movie.country.split(',').map((country) => (
+    country.trim()
+  ));*/
+
+  allMovies.push(movie);  
 });
 
 fs.writeFile(`${rootDir}movies.json`,
