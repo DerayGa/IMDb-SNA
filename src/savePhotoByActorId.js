@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+const path = require('path');
 const jsdom = require('jsdom');
 var wget = require('wget');
 const fetch = require('node-fetch');
@@ -14,6 +15,14 @@ actors.forEach((actor) => {
   actor.photo = '';
 });
 
+const photoList = fs.readdirSync(photoDir)
+  .filter((name) => {
+    const filename = path.join(photoDir, name);
+    const stats = fs.statSync(filename);
+
+    return (stats.isFile() && path.extname(filename) === '.jpg');
+  }).map((name) => (name.replace('.jpg', '')));
+
 const checkCompleted = () => {
   if( count == 0) {
     console.log(`allActors with Photo Saved.`);
@@ -24,8 +33,8 @@ const checkCompleted = () => {
 };
 
 const getPhotoById = (actor) => {
-  if (actor.photo) {
-    console.log(actor.name, ' -> ', actor.photo);
+  if (photoList.indexOf(actor.id)) {
+    console.log(actor.name, ' photo existed');
     count--;
     checkCompleted();
     return;
@@ -40,10 +49,10 @@ const getPhotoById = (actor) => {
         ["http://code.jquery.com/jquery.js"],
         (err, window) => {
           const $ = window.$;
-          actor.photo = $('img#name-poster').attr('src');
-          if (actor.photo) {
+          const imgSrc = $('img#name-poster').attr('src');
+          if (imgSrc) {
             console.log('found! ', actor.name);
-            wget.download(actor.photo, `${photoDir}${actor.id}.jpg`); 
+            wget.download(imgSrc, `${photoDir}${actor.id}.jpg`); 
             
           } else {
             console.log('NOT found! ', actor.name);
