@@ -7,6 +7,10 @@ const actors = require('../movies/actors.json').actors;
 const rootDir = '../movies/';
 var count = actors.length;
 
+const isAlphaOrParen = (str) => {
+  return /^[A-Za-z ]+$/.test(str);
+}
+
 const saveToJSON = () => {
   fs.writeFile(`${rootDir}actors.json`,
     JSON.stringify({ actors: actors }, null, 2), (err) => {
@@ -28,7 +32,13 @@ const checkCompleted = () => {
 
 const getIdByName = (actor) => {
   if (actor.id) {
-    console.log(actor.name, ' -> ', actor.id);
+    //console.log(actor.name, ' -> ', actor.id);
+    count--;
+    checkCompleted();
+    return;
+  }
+  if (!isAlphaOrParen(actor.name)) {
+    console.log('skip not english name for now', actor.name);
     count--;
     checkCompleted();
     return;
