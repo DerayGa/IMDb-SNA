@@ -38,8 +38,6 @@ const getIdByName = (actor) => {
     return;
   }
   if (!isAlphaOrParen(actor.name)) {
-    console.log('get from m.imdb');
-
     var url = `http://m.imdb.com/find?q=${encodeURI(actor.name)}`;
 
     fetch(url)
@@ -73,33 +71,33 @@ const getIdByName = (actor) => {
         )
       });
   } else {
-    console.log('get from imdb api');
     var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${actor.name}`;
 
     fetch(url)
       .then((res) => (
         res.json()
       )).then((json) => {
-        if (json.name_exact) {
-          json.name_exact.forEach((obj) => {
+        const compareFromArray = (array) => {
+          array.forEach((obj) => {
             if (obj.name == actor.name) {
               actor.id = obj.id;
             }
           });
+          if (!actor.id && array.length) {
+            console.log('=============guess=============');
+            actor.id = array[0].id;
+            console.log(actor.name, array[0].name)
+            console.log('===============================');
+          }
+        }
+        if (json.name_exact) {
+          compareFromArray(json.name_exact);
         }
         if (json.name_approx && !actor.id) {
-          json.name_approx.forEach((obj) => {
-            if (obj.name == actor.name) {
-              actor.id = obj.id;
-            }
-          });
+          compareFromArray(json.name_approx);
         }
         if (json.name_popular && !actor.id) {
-          json.name_popular.forEach((obj) => {
-            if (obj.name == actor.name) {
-              actor.id = obj.id;
-            }
-          });
+          compareFromArray(json.name_popular);
         }
 
         if (actor.id) {
