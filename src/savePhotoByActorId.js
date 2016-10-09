@@ -33,8 +33,8 @@ const checkCompleted = () => {
 };
 
 const getPhotoById = (actor) => {
-  if (photoList.indexOf(actor.id)) {
-    console.log(actor.name, ' photo existed');
+  if (photoList.indexOf(actor.id) > 0) {
+    console.log(actor.name, 'photo existed');
     count--;
     checkCompleted();
     return;

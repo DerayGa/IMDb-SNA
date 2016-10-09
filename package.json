@@ -26,6 +26,7 @@
   "dependencies": {
     "imdb-api": "^2.1.0",
     "jsdom": "^9.6.0",
-    "node-fetch": "^1.6.3"
+    "node-fetch": "^1.6.3",
+    "wget": "0.0.1"
   }
 }
