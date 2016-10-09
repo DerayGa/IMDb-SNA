@@ -22,10 +22,10 @@
 <script src="./js/d3/d3.min.js"></script>
 <script>
   window.onload = () => {
-    const nodeScale = 0.3;
+    const nodeScale = 0.6;
     const nodeWidth = 89;
     const nodeHeight = 132;
-    const linkDistance = 300;
+    const linkDistance = 450;
     const nodeWidthRadius = nodeWidth * nodeScale / 2;
     const nodeHeightRadius = nodeHeight * nodeScale / 2;
 
@@ -41,7 +41,7 @@
     var simulation = d3.forceSimulation()
         .force("link", 
           d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; }))
-        .force("charge", d3.forceManyBody())
+        .force("charge", d3.forceManyBody().distanceMin(25).strength(-60))
         .force("center", d3.forceCenter(width / 2, height / 2))
 
     d3.json("./test.json", function(error, graph) {
@@ -120,24 +120,26 @@
         gnode
             .attr("x", function(d) { 
               //return d.x - nodeWidthRadius;
-              return d.x = Math.max(nodeWidthRadius, Math.min(width - nodeWidthRadius * 2, d.x));
+              return d.x = Math.max(nodeWidthRadius, 
+                Math.min(width - nodeWidthRadius * 2, d.x - nodeWidthRadius));
             })
             .attr("y", function(d) {
               //return d.y - nodeHeightRadius;
-              return d.y = Math.max(nodeHeightRadius, Math.min(height - nodeHeightRadius * 2, d.y));
+              return d.y = Math.max(nodeHeightRadius, 
+                Math.min(height - nodeHeightRadius * 2, d.y - nodeHeightRadius));
             });
       }
     });
 
     function dragstarted(d) {
       if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
+      d.fx = d.x + nodeWidthRadius;
+      d.fy = d.y + nodeHeightRadius;
     }
 
     function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
+      d.fx = d3.event.x + nodeWidthRadius;
+      d.fy = d3.event.y + nodeHeightRadius;
     }
 
     function dragended(d) {

@@ -8,7 +8,7 @@ const allActors = require('../movies/actors.json').actors;
 
 const rootDir = '../';
 const photoDir ='../res/photos/';
-//const movies = moviesFilter.filterByYear(2002, allMovies);
+
 //const movies = moviesFilter.filterByRating(8, allMovies);
 //const movies = moviesFilter.filterByGenre('Sci-Fi', allMovies);
 //const movies = moviesFilter.filterByActor('Christian Bale', allMovies);
@@ -35,12 +35,17 @@ fs.readdirSync(photoDir)
 //const condition = { actor: 'Christian Bale' };
 //const condition = { actor: 'Tom Cruise' };
 //const condition = { actor: 'Robert Downey Jr.' };
+//const condition = { actor: 'Daniel Radcliffe' };
+const condition = { actor: 'Heath Ledger' };
 
 //const condition = { director: 'Christopher Nolan' };
+//const condition = { director: 'Christopher Nolan' };
+
 //const condition = { genre: 'Sci-Fi', rating: 8 };
 //const condition = { genre: 'Sci-Fi' };
 //const condition = { genre: 'Comedy' };
-const condition = { year: '2000' };
+//const condition = { year: '2016' };
+//const condition = { rating: 8.6 };
 //const condition = {};
 
 const movies = moviesFilter.filterBy(condition, allMovies);
