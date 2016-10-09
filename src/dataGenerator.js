@@ -36,10 +36,42 @@ fs.readdirSync(photoDir)
 //const condition = { actor: 'Tom Cruise' };
 //const condition = { actor: 'Robert Downey Jr.' };
 //const condition = { actor: 'Daniel Radcliffe' };
-const condition = { actor: 'Heath Ledger' };
+//const condition = { actor: 'Heath Ledger' };
+//const condition = { actor: 'Johnny Depp' };
+//const condition = { actor: 'Brad Pitt' };
+//const condition = { actor: 'Angelina Jolie' };
+
+//const condition = { actor: 'Russell Crowe' };//2000
+//const condition = { actor: 'Denzel Washington' };//2001
+//const condition = { actor: 'Adrien Brody' };//2002
+//const condition = { actor: 'Sean Penn' };//2003, 2008
+//const condition = { actor: 'Jamie Foxx' };//2004
+//const condition = { actor: 'Philip Seymour Hoffman' };//2005
+//const condition = { actor: 'Forest Whitaker' };//2006
+//const condition = { actor: 'Daniel Day-Lewis' };//2007, 2012
+//const condition = { actor: 'Jeff Bridges' };//2009
+//const condition = { actor: 'Colin Firth' };//2010
+//const condition = { actor: 'Jean Dujardin' };//2011
+//const condition = { actor: 'Matthew McConaughey' };//2013
+//const condition = { actor: 'Eddie Redmayne' };//2014
+const condition = { actor: 'Leonardo DiCaprio' };//2015
 
 //const condition = { director: 'Christopher Nolan' };
 //const condition = { director: 'Christopher Nolan' };
+//const condition = { director: 'Steven Soderbergh' };//2000
+//const condition = { director: 'Ron Howard' };//2001
+//const condition = { director: 'Roman Polanski' };//2002
+//const condition = { director: 'Peter Jackson' };//2003
+//const condition = { director: 'Clint Eastwood' };//2004
+//const condition = { director: 'Ang Lee' };//2005, 2012
+//const condition = { director: 'Martin Scorsese' };//2006
+//const condition = { director: 'Joel Coen' };//2007
+//const condition = { director: 'Danny Boyle' };//2008
+//const condition = { director: 'Kathryn Bigelow' };//2009
+//const condition = { director: 'Tom Hooper' };//2010
+//const condition = { director: 'Michel Hazanavicius' };//2011
+//const condition = { director: 'Alfonso Cuarón' };//2013
+//const condition = { director: 'Alejandro G. Iñárritu' };//2014, 2015
 
 //const condition = { genre: 'Sci-Fi', rating: 8 };
 //const condition = { genre: 'Sci-Fi' };

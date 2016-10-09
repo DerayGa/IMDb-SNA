@@ -22,7 +22,7 @@
 <script src="./js/d3/d3.min.js"></script>
 <script>
   window.onload = () => {
-    const nodeScale = 0.6;
+    const nodeScale = 0.3;
     const nodeWidth = 89;
     const nodeHeight = 132;
     const linkDistance = 450;
@@ -54,8 +54,8 @@
         .data(graph.links)
         .enter().append("line")
           .attr("stroke-width", function(d) {
-            //return d.value;
-            return Math.sqrt(d.value);
+            return d.value;
+            //return Math.sqrt(d.value);
           });
 
       var gnodes = svg.append("g")
