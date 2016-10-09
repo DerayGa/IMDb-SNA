@@ -2,52 +2,25 @@
 const fs = require('fs');
 const jsdom = require('jsdom');
 const fetch = require('node-fetch');
-//const http = require('http');
-const iconv = require('iconv-lite');
+const decoder = require('./convertHexNCR2Char.js');
 
-name = 'Adrián Navarro';
-var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${encodeURI(name)}`;
-console.log(url)
-fetch(url)
-  .then((res) => (
-    res.text()
-  )).then((body) => {
-    var iconv = new Iconv('UTF-8', 'ISO-8859-1'); 
-    var latinBuf = iconv.convert(body); 
-    console.log('fetch', body)
-    console.log('latinBuf', latinBuf)
-  });
+//const actors = require('../movies/actors.json').actors;
 
-/*http.get(url, function(res) {
-  res.setEncoding('utf8');
-
-  var data = '';
-  res.on('data', function (chunk) {
-    data += chunk;
-  });
-  res.on('end', function() {
-    console.log('http', data)
-  });
-});*/
-
-return;
-
-const actors = require('../movies/actors.json').actors;
+const actors = [{
+  "name": "Adrián Navarro",
+  "id": ""
+}];
 
 const rootDir = '../movies/';
 var count = actors.length;
 
-const isAlphaOrParen = (str) => {
-  return /^[A-Za-z ]+$/.test(str);
-}
-
 const saveToJSON = () => {
-  fs.writeFile(`${rootDir}actors.json`,
+  /*fs.writeFile(`${rootDir}actors.json`,
     JSON.stringify({ actors: actors }, null, 2), (err) => {
     if (err) {
       return console.error(err);
     }
-  });
+  });*/
 };
 
 const checkCompleted = () => {
@@ -67,84 +40,52 @@ const getIdByName = (actor) => {
     checkCompleted();
     return;
   }
-  if (!isAlphaOrParen(actor.name)) {
-    var url = `http://m.imdb.com/find?q=${encodeURI(actor.name)}`;
 
-    fetch(url)
-      .then((res) => (
-        res.text()
-      )).then((body) => {
-        jsdom.env(
-          body,
-          ["http://code.jquery.com/jquery.js"],
-          (err, window) => {
-            const $ = window.$
-            const result = $('section.posters > div.poster > div.label > div.title > a');
-            result.each((index, node) => {
-              if($(node).text() == actor.name){
-                actor.id = $(node).attr('href').split('/')[2];
-                return false;
-              }
-            });
+  var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${actor.name}`;
 
-            if (actor.id) {
-              console.log('found! ', actor.name, actor.id);
-              
-              saveToJSON();
-            } else {
-              console.log('NOT found! ', actor.name);
-            }
-            count--;
-
-            checkCompleted();
+  fetch(url)
+    .then((res) => (
+      res.text()
+    )).then((text) => {
+      var json = JSON.parse(decoder.convertHexNCR2Char(text));
+      
+      const compareFromArray = (array) => {
+        array.forEach((obj) => {
+          if (obj.name == actor.name) {
+            actor.id = obj.id;
           }
-        )
-      });
-  } else {
-    var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${actor.name}`;
-
-    fetch(url)
-      .then((res) => (
-        res.json()
-      )).then((json) => {
-        const compareFromArray = (array) => {
-          array.forEach((obj) => {
-            if (obj.name == actor.name) {
-              actor.id = obj.id;
-            }
-          });
-          if (!actor.id && array.length) {
-            console.log('=============guess=============');
-            actor.id = array[0].id;
-            console.log(actor.name, array[0].name)
-            console.log('===============================');
-          }
+        });
+        if (!actor.id && array.length) {
+          console.log('=============guess=============');
+          actor.id = array[0].id;
+          console.log(actor.name, array[0].name)
+          console.log('===============================');
         }
+      }
 
-        if (json.name_popular && !actor.id) {
-          compareFromArray(json.name_popular);
-        }
+      if (json.name_popular && !actor.id) {
+        compareFromArray(json.name_popular);
+      }
 
-        if (json.name_exact) {
-          compareFromArray(json.name_exact);
-        }
+      if (json.name_exact) {
+        compareFromArray(json.name_exact);
+      }
 
-        if (json.name_approx && !actor.id) {
-          compareFromArray(json.name_approx);
-        }
+      if (json.name_approx && !actor.id) {
+        compareFromArray(json.name_approx);
+      }
 
-        if (actor.id) {
-          console.log('found! ', actor.name, actor.id);
-          
-          saveToJSON();
-        } else {
-          console.log('NOT found! ', actor.name);
-        }
-        count--;
+      if (actor.id) {
+        console.log('found! ', actor.name, actor.id);
+        
+        saveToJSON();
+      } else {
+        console.log('NOT found! ', actor.name);
+      }
+      count--;
 
-        checkCompleted();
-      });
-  }
+      checkCompleted();
+    });
 };
 
 
