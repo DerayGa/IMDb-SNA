@@ -2,7 +2,7 @@
 const fs = require('fs');
 const jsdom = require('jsdom');
 const fetch = require('node-fetch');
-const decoder = require('./convertHexNCR2Char.js');
+const decoder = require('./convertAllEscapes.js');
 const actors = require('../movies/actors.json').actors;
 
 const rootDir = '../movies/';
@@ -36,23 +36,20 @@ const getIdByName = (actor) => {
   }
 
   var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${actor.name}`;
-
   fetch(url)
     .then((res) => (
-      res.text()
-    )).then((text) => {
-      var json = JSON.parse(decoder.convertHexNCR2Char(text));
-
+      res.json()
+    )).then((json) => {
       const compareFromArray = (array, guess) => {
         array.forEach((obj) => {
-          if (obj.name == actor.name) {
+          if (decoder.convertAllEscapes(obj.name) == actor.name) {
             actor.id = obj.id;
           }
         });
         if (!actor.id && array.length && guess) {
           console.log('=============guess=============');
           actor.id = array[0].id;
-          console.log(actor.name, ' -> ', array[0].name)
+          console.log(actor.name, ' -> ', decoder.convertAllEscapes((array[0].name)))
           console.log('===============================');
         }
       }
@@ -96,3 +93,7 @@ const getIdByName = (actor) => {
 
 var idx = 0;
 getIdByName(actors[idx]);
+getIdByName(actors[++idx]);
+getIdByName(actors[++idx]);
+getIdByName(actors[++idx]);
+getIdByName(actors[++idx]);
