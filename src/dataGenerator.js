@@ -32,10 +32,18 @@ fs.readdirSync(photoDir)
     });
   });
 
-const movies = moviesFilter.filterBy({
-  actor: 'Christian Bale',
-  rating: 8,
-}, allMovies);
+//const condition = { actor: 'Christian Bale' };
+//const condition = { actor: 'Tom Cruise' };
+//const condition = { actor: 'Robert Downey Jr.' };
+
+//const condition = { director: 'Christopher Nolan' };
+//const condition = { genre: 'Sci-Fi', rating: 8 };
+//const condition = { genre: 'Sci-Fi' };
+//const condition = { genre: 'Comedy' };
+const condition = { year: '2000' };
+//const condition = {};
+
+const movies = moviesFilter.filterBy(condition, allMovies);
 
 var actors = [];
 
@@ -65,41 +73,50 @@ const findActorByName = (name) => (
   allActors.filter((actor) => (actor.name == name))[0]
 )
 actors = actors.map(findActorByName);
-console.log('Actors:', actors.length);
 
 actors.forEach((actor) => {
+  //ignore those who have no photo(sorry~)
+  if (!actor.photo) return;
+
   sna.nodes.push({
     id: actor.id,
     name: actor.name,
-    photo: actor.photo || 'noPhoto.jpg',
+    photo: actor.photo,
     group: 0,
   });
 });
+console.log('Actors:', sna.nodes.length);
 
 movies.forEach((movie, index) => {
-  movie.actors.forEach((source) => {
-    const sourceId = findActorByName(source).id;
-    movie.actors.forEach((target) => {
-      const targetId = findActorByName(target).id;
-      if (sourceId == targetId) 
+  movie.actors.forEach((sourceName) => {
+    const source = findActorByName(sourceName);
+    if (!source.photo)
+      return;
+
+    movie.actors.forEach((targetName) => {
+      const target = findActorByName(targetName);
+      if (!target.photo)
+        return;
+
+      if (source.id == target.id) 
         return;
 
       var link = sna.links.filter((link) => (
         (
-          ( link.source == sourceId && link.target == targetId) || 
-          ( link.source == targetId && link.target == sourceId)
+          ( link.source == source.id && link.target == target.id) || 
+          ( link.source == target.id && link.target == source.id)
         )
       ))[0];
       if (!link) {
-        link = { source: sourceId, target: targetId, value: 0};
+        link = { source: source.id, target: target.id, value: 0};
         sna.links.push(link);
       }
-      link.value++;
-      //console.log(source, target)
+      
+      link.value = (link.value) ? link.value*2 : 1;
     });
   });
 });
-console.log('links:', sna.links.length);
+console.log('Links:', sna.links.length);
 
 fs.writeFile(`${rootDir}test.json`,
   JSON.stringify(sna, null, 2), (err) => {
