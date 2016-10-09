@@ -28,11 +28,32 @@ const checkCompleted = () => {
 };
 
 const getIdByName = (actor) => {
+  if (!actor) return;
   if (actor.id) {
     //console.log(actor.name, ' -> ', actor.id);
     count--;
     checkCompleted();
     return;
+  }
+  const isActorOrActress = (description) => {
+    const desc = description.toLowerCase();
+    return (desc.indexOf('actor') > -1 || desc.indexOf('actress') > -1);
+  }
+
+  const compareFromArray = (array, guess) => {
+    array.forEach((obj) => {
+      if (!actor.id
+        && decoder.convertAllEscapes(obj.name) == actor.name
+        && isActorOrActress(obj.description)) {
+        actor.id = obj.id; //find first and stop
+      }
+    });
+    if (!actor.id && array.length && guess) {
+      console.log('=============guess=============');
+      actor.id = array[0].id;
+      console.log(actor.name, ' -> ', decoder.convertAllEscapes((array[0].name)))
+      console.log('===============================');
+    }
   }
 
   var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${actor.name}`;
@@ -40,20 +61,6 @@ const getIdByName = (actor) => {
     .then((res) => (
       res.json()
     )).then((json) => {
-      const compareFromArray = (array, guess) => {
-        array.forEach((obj) => {
-          if (decoder.convertAllEscapes(obj.name) == actor.name) {
-            actor.id = obj.id;
-          }
-        });
-        if (!actor.id && array.length && guess) {
-          console.log('=============guess=============');
-          actor.id = array[0].id;
-          console.log(actor.name, ' -> ', decoder.convertAllEscapes((array[0].name)))
-          console.log('===============================');
-        }
-      }
-
       if (json.name_popular && !actor.id) {
         compareFromArray(json.name_popular);
       }
