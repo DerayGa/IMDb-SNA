@@ -2,6 +2,36 @@
 const fs = require('fs');
 const jsdom = require('jsdom');
 const fetch = require('node-fetch');
+//const http = require('http');
+const iconv = require('iconv-lite');
+
+name = 'Adrián Navarro';
+var url = `http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=${encodeURI(name)}`;
+console.log(url)
+fetch(url)
+  .then((res) => (
+    res.text()
+  )).then((body) => {
+    var iconv = new Iconv('UTF-8', 'ISO-8859-1'); 
+    var latinBuf = iconv.convert(body); 
+    console.log('fetch', body)
+    console.log('latinBuf', latinBuf)
+  });
+
+/*http.get(url, function(res) {
+  res.setEncoding('utf8');
+
+  var data = '';
+  res.on('data', function (chunk) {
+    data += chunk;
+  });
+  res.on('end', function() {
+    console.log('http', data)
+  });
+});*/
+
+return;
+
 const actors = require('../movies/actors.json').actors;
 
 const rootDir = '../movies/';
@@ -90,14 +120,17 @@ const getIdByName = (actor) => {
             console.log('===============================');
           }
         }
+
+        if (json.name_popular && !actor.id) {
+          compareFromArray(json.name_popular);
+        }
+
         if (json.name_exact) {
           compareFromArray(json.name_exact);
         }
+
         if (json.name_approx && !actor.id) {
           compareFromArray(json.name_approx);
-        }
-        if (json.name_popular && !actor.id) {
-          compareFromArray(json.name_popular);
         }
 
         if (actor.id) {
