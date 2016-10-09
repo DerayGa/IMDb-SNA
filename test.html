@@ -12,114 +12,139 @@
   stroke-width: 1.5px;
 }
 
+.nodes rect {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
 </style>
-<svg width="960" height="600"></svg>
+<svg width="640" height="480"></svg>
 <script src="./js/d3/d3.min.js"></script>
 <script>
+  window.onload = () => {
+    const nodeScale = 0.3;
+    const nodeWidth = 89;
+    const nodeHeight = 132;
+    const linkDistance = 300;
+    const nodeWidthRadius = nodeWidth * nodeScale / 2;
+    const nodeHeightRadius = nodeHeight * nodeScale / 2;
 
-var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+    var width = document.body.offsetWidth;
+    var height = document.body.offsetHeight;
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+    var svg = d3.select("svg")
+                .attr("width", width)
+                .attr("height", height);
 
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().distance(300).id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2))
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-d3.json("./test.json", function(error, graph) {
-  if (error) throw error;
+    var simulation = d3.forceSimulation()
+        .force("link", 
+          d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; }))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2))
 
-  var glinks = svg.append("g")
-      .attr("class", "links");
+    d3.json("./test.json", function(error, graph) {
+      if (error) throw error;
 
-  var links = glinks.selectAll()
-    .data(graph.links)
-    .enter().append("line")
-      .attr("stroke-width", function(d) {
-        return d.value;
-        //Math.sqrt(d.value);
-      });
+      var glinks = svg.append("g")
+          .attr("class", "links");
 
-  var gnodes = svg.append("g")
-      .attr("class", "nodes");
-  
-  var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){ return d.id; });
-  
-  var gnode = node.enter().append("svg")
-      .attr("width", 50)
-      .attr("height", 50)
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
+      var links = glinks.selectAll()
+        .data(graph.links)
+        .enter().append("line")
+          .attr("stroke-width", function(d) {
+            //return d.value;
+            return Math.sqrt(d.value);
+          });
 
-  gnode.append("defs")
-      .append("pattern")
-        .attr("id", function(d){ return "image"+d.id; } )
-        .attr("patternUnits", "objectBoundingBox")
-        .attr("width", "100%")
-        .attr("height", "100%")
-      .append("image")
-        .attr("x", "0")
-        .attr("y", "-12")
-        .attr("width", "50")
-        .attr("height", "74")
-        .attr("xlink:href", function(d){ return "./res/photos/"+d.photo; } )
+      var gnodes = svg.append("g")
+          .attr("class", "nodes");
+      
+      var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){ return d.id; });
 
-  var nodes = gnode.append("circle")
-      .attr("r", 25)
-      .attr("cx", 25)
-      .attr("cy", 25)
-      .style("fill", function(d){ return "url(#image"+d.id+")"; } )
-      //.attr("fill", function(d) { return color(d.group); })
+      var gnode = node.enter().append("svg")
+          .attr("width", nodeWidth * nodeScale)
+          .attr("height", nodeHeight * nodeScale)
+          .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
 
-  /*gnode.append("image")
-    .attr("x", "10")
-    .attr("y", "3")
-    .attr("width", "30")
-    .attr("height", "44")
-    .attr("xlink:href", function(d){ return "./res/photos/"+d.photo; } );*/
+      gnode.append("defs")
+          .append("pattern")
+            .attr("id", function(d){ return "image"+d.id; } )
+            .attr("patternUnits", "objectBoundingBox")
+            .attr("width", "100%")
+            .attr("height", "100%")
+          .append("image")
+            .attr("width", nodeWidth * nodeScale)
+            .attr("height", nodeHeight * nodeScale)
+            .attr("xlink:href", function(d){ return "./res/photos/"+d.photo; } )
 
-  gnode.append("title")
-      .text(function(d) { return d.name; });
+      /*gnode.append("circle")
+            .attr("r", 25)
+            .attr("cx", 25)
+            .attr("cy", 25)
+            .style("fill", function(d){ return "url(#image"+d.id+")"; } )*/
+      gnode.append("rect")
+            .attr("width", nodeWidth * nodeScale)
+            .attr("height", nodeHeight * nodeScale)
+            .style("fill", function(d){ return "url(#image"+d.id+")"; } )
+          //.attr("fill", function(d) { return color(d.group); })
 
-  simulation
-      .nodes(graph.nodes)
-      .on("tick", ticked);
+      /*gnode.append("image")
+        .attr("x", "10")
+        .attr("y", "3")
+        .attr("width", "30")
+        .attr("height", "44")
+        .attr("xlink:href", function(d){ return "./res/photos/"+d.photo; } );*/
 
-  simulation.force("link")
-      .links(graph.links);
+      gnode.append("title")
+          .text(function(d) { return d.name; });
 
-  function ticked() {
-    links
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+      simulation
+          .nodes(graph.nodes)
+          .on("tick", ticked);
 
-    gnode
-        .attr("x", function(d) { return d.x - 25; })
-        .attr("y", function(d) { return d.y - 25; });
+      simulation.force("link")
+          .links(graph.links);
+
+      function ticked() {
+        links
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+
+        gnode
+            .attr("x", function(d) { 
+              //return d.x - nodeWidthRadius;
+              return d.x = Math.max(nodeWidthRadius, Math.min(width - nodeWidthRadius * 2, d.x));
+            })
+            .attr("y", function(d) {
+              //return d.y - nodeHeightRadius;
+              return d.y = Math.max(nodeHeightRadius, Math.min(height - nodeHeightRadius * 2, d.y));
+            });
+      }
+    });
+
+    function dragstarted(d) {
+      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+      if (!d3.event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
   }
-});
-
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
-}
-
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
-
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
-}
 
 </script>

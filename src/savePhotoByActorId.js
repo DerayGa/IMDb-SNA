@@ -33,8 +33,9 @@ const checkCompleted = () => {
 };
 
 const getPhotoById = (actor) => {
+    if(!actor) return;
   if (photoList.indexOf(actor.id) > 0) {
-    console.log(actor.name, 'photo existed');
+    //console.log(actor.name, 'photo existed');
     count--;
     checkCompleted();
     return;
@@ -51,11 +52,11 @@ const getPhotoById = (actor) => {
           const $ = window.$;
           const imgSrc = $('img#name-poster').attr('src');
           if (imgSrc) {
-            console.log('found! ', actor.name);
+            console.log('found! ', actor.name, `#${idx}`);
             wget.download(imgSrc, `${photoDir}${actor.id}.jpg`); 
             
           } else {
-            console.log('NOT found! ', actor.name);
+            console.log('NOT found! ', actor.name, `#${idx}`);
           }
           count--;
 
@@ -67,3 +68,6 @@ const getPhotoById = (actor) => {
 
 var idx = 0;
 getPhotoById(actors[idx]);
+getPhotoById(actors[idx++]);
+getPhotoById(actors[idx++]);
+getPhotoById(actors[idx++]);
