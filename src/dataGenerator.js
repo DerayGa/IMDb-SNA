@@ -1,20 +1,40 @@
 "use strict";
 
 const fs = require('fs');
+const path = require('path');
 const moviesFilter = require('./moviesFilter.js');
 const allMovies = require('../movies/movies.json');
 const allActors = require('../movies/actors.json').actors;
 
 const rootDir = '../';
+const photoDir ='../res/photos/';
 //const movies = moviesFilter.filterByYear(2002, allMovies);
 //const movies = moviesFilter.filterByRating(8, allMovies);
 //const movies = moviesFilter.filterByGenre('Sci-Fi', allMovies);
 //const movies = moviesFilter.filterByActor('Christian Bale', allMovies);
 //const movies = moviesFilter.filterByDirector('Christopher Nolan', allMovies);
-const movies = moviesFilter.filterBy({
+/*const movies = moviesFilter.filterBy({
   year: 2000,
-  rating: 8.5,
-  //genre: 'Sci-Fi'
+  genre: 'Sci-Fi'
+}, allMovies);*/
+
+fs.readdirSync(photoDir)
+  .filter((name) => {
+    const filename = path.join(photoDir, name);
+    const stats = fs.statSync(filename);
+
+    return (stats.isFile() && path.extname(filename) === '.jpg');
+  }).forEach((photo) => {
+    allActors.forEach((actor) => {
+      if (photo.indexOf(actor.id) == 0) {
+        actor.photo = photo;
+      }
+    });
+  });
+
+const movies = moviesFilter.filterBy({
+  actor: 'Christian Bale',
+  rating: 8,
 }, allMovies);
 
 var actors = [];
@@ -51,9 +71,11 @@ actors.forEach((actor) => {
   sna.nodes.push({
     id: actor.id,
     name: actor.name,
+    photo: actor.photo || 'noPhoto.jpg',
     group: 0,
   });
 });
+
 movies.forEach((movie, index) => {
   movie.actors.forEach((source) => {
     const sourceId = findActorByName(source).id;
