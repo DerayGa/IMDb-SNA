@@ -18,10 +18,43 @@
 }
 
 </style>
-<svg width="640" height="480"></svg>
+
+<body>
+  <svg width="640" height="480"></svg>
+  <button onclick="reload()">GA</button>
+</body>
+
 <script src="./js/d3/d3.min.js"></script>
+<script src="./js/loadJSON.js"></script>
+<script src="./js/dataGenerator.js"></script>
+<script src="./js/moviesFilter.js"></script>
+
 <script>
+  let graph;
+  let svg;
+  const reload = () => {
+    svg.remove();
+    svg = d3.selectAll("body").append("svg");
+
+    drawSNA(graph);
+  }
+
   window.onload = () => {
+    loadJSON('movies.json', (allMovies) => {
+      loadJSON('actors.json', (actors) => {
+        const allActors = actors.actors;
+        const condition = { actor: 'Colin Firth' };
+        //const condition = { genre: 'Sci-Fi', rating: 8 };
+        const movies = filterBy(condition, allMovies);
+        graph = dataGenerator(movies, allActors);
+
+        drawSNA(graph);
+      });
+    });
+  }
+
+  const drawSNA = (graph) => {
+
     const nodeScale = 0.3;
     const nodeWidth = 89;
     const nodeHeight = 132;
@@ -32,7 +65,7 @@
     var width = document.body.offsetWidth;
     var height = document.body.offsetHeight;
 
-    var svg = d3.select("svg")
+    svg = d3.select("svg")
                 .attr("width", width)
                 .attr("height", height);
 
@@ -44,8 +77,8 @@
         .force("charge", d3.forceManyBody().distanceMin(25).strength(-60))
         .force("center", d3.forceCenter(width / 2, height / 2))
 
-    d3.json("./test.json", function(error, graph) {
-      if (error) throw error;
+    //d3.json(movies, function(error, graph) {
+      //if (error) throw error;
 
       var glinks = svg.append("g")
           .attr("class", "links");
@@ -60,7 +93,7 @@
 
       var gnodes = svg.append("g")
           .attr("class", "nodes");
-      
+
       var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){ return d.id; });
 
       var gnode = node.enter().append("svg")
@@ -129,7 +162,7 @@
                 Math.min(height - nodeHeightRadius * 2, d.y - nodeHeightRadius));
             });
       }
-    });
+    //});
 
     function dragstarted(d) {
       if (!d3.event.active) simulation.alphaTarget(0.3).restart();
