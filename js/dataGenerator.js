@@ -12,9 +12,11 @@ const dataGenerator = (movies, allActors) => {
 
   //change actors from string to array
   movies.forEach((movie, index) => {
-    movie.actors = movie.actors.split(',').map((actor) => (
-      actor.trim()
-    ));
+    if(typeof movie.actors == 'string') {
+      movie.actors = movie.actors.split(',').map((actor) => (
+        actor.trim()
+      ));
+    }
 
     movie.actors.forEach((actor) => {
       if (actors.indexOf(actor) < 0) {

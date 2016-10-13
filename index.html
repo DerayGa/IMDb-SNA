@@ -1,81 +1,198 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="./css/normalize.css">
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="./css/jquery-ui.css">
+<link rel="stylesheet" href="./css/sna.css">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="./js/jquery.min.js"></script>
+<script src="./js/jquery-ui.min.js"></script>
 <script src="./js/d3/d3.min.js"></script>
 <script src="./js/loadJSON.js"></script>
 <script src="./js/dataGenerator.js"></script>
 <script src="./js/moviesFilter.js"></script>
 
-<style>
-body {
-  overflow: hidden;
-}
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
-
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-.nodes rect {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-header{
-  background-color: #2196F3;
-  width: 100%;
-  position: absolute;
-  padding: 10px;
-  height: 23px;
-}
-div#nodeSlider{
-  margin-left: 30px;
-  display: inline-block;
-  width: 120px;
-}
-div#linkSlider{
-  margin-left: 30px;
-  margin-right: 30px;
-  display: inline-block;
-  width: 120px;
-}
-</style>
-
 <body>
+  <label id="condition"></label>
   <header>
-    <button onclick="reload()">Reload</button>
-    <div id="nodeSlider"></div>
-    <div id="linkSlider"></div>
+    <span class="space">
+    <div class="ui-widget">
+      <label>Year:</label>
+      <div id="yearSlider"></div>
+    </div>
+    <div class="ui-widget">
+      <label>Rating:</label>
+      <div id="ratingSlider"></div>
+    </div>
+    <div class="ui-widget">
+      <label>Actor:</label>
+      <input id="actor">
+    </div>
+    <div class="ui-widget">
+      <label>Director:</label>
+      <input id="director">
+    </div>
+    <div class="ui-widget">
+      <label>Genre:</label>
+      <select id="genre">
+        <option>Action</option>
+        <option>Adventure</option>
+        <option>Biography</option>
+        <option>Comedy</option>
+        <option>Crime</option>
+        <option>Fantasy</option>
+        <option>History</option>
+        <option>Horror</option>
+        <option>Music</option>
+        <option>Romance</option>
+        <option>Sci-Fi</option>
+      </select>
+    </div>
   </header>
+  <footer>
+    <div class="ui-widget">
+      <label>Size:</label>
+      <div id="nodeSlider"></div>
+    </div>
+    <div class="ui-widget">
+      <label>Link:</label>
+      <div id="linkSlider"></div>
+    </div>
+  </footer>>
   <svg width="640" height="480"></svg>
 </body>
 
 <script>
-  let graph;
+  const nodeWidth = 89;
+  const nodeHeight = 132;
   let svg;
   let nodeScale = 0.5;
-  let nodeWidth = 89;
-  let nodeHeight = 132;
   let linkDistance = 350;
   let nodeWidthRadius = nodeWidth * nodeScale / 2;
   let nodeHeightRadius = nodeHeight * nodeScale / 2;
+  const timer = 1000;
 
+  //CONDITION;
+  let actor = '';
+  let year = 2016;
+  let genre = '';
+  let director = '';
+  let rating = 8;
+  let condition;
+  let graph;
+  let allMovies;
+  let allActors;
+
+  let fadeOutFlag;
+  const createCondition = () => {
+    condition = {};
+
+    if (actor.length) {
+      condition.actor = actor;
+    }
+
+    if (director.length) {
+      condition.director = director;
+    }
+
+    if (rating > 6) {
+      condition.rating = rating;
+    }
+
+    if (genre.length) {
+      condition.genre = genre;
+    }
+
+    if (year >= 2000 && year <= 2016) {
+      condition.year = year;
+    }
+
+    console.log(condition);
+
+    return condition;
+  }
+
+  const searchAndReload = (condition) => {
+    var result = filterBy(condition, allMovies);
+    graph = dataGenerator(result, allActors);
+    reload();
+  }
   const reload = () => {
+    if(!svg) return;
+
     svg.remove();
     svg = d3.selectAll("body").append("svg");
 
     drawSNA(graph);
   }
 
+  const showCondition = () => {
+    $("#condition").fadeIn();
+    clearTimeout(fadeOutFlag)
+    fadeOutFlag = setTimeout(() => {
+      $("#condition").fadeOut("slow");
+      const condition = createCondition();
+      searchAndReload(condition);
+    }, timer);
+  }
   $( function() {
-    $( "#nodeSlider" ).slider({
+    $("#genre").selectmenu({width: 150});
+    $('#genre').on('selectmenuchange', function(){
+      genre = this.value;
+      let symbol;
+      switch (genre){
+        case 'Action':
+          symbol = '?';
+          break;
+
+        case 'Adventure':
+          symbol = '?';
+          break;
+
+        case 'Biography':
+          symbol = '?';
+          break;
+
+        case 'Comedy':
+          symbol = '?';
+          break;
+
+        case 'Crime':
+          symbol = '?';
+          break;
+
+        case 'Fantasy':
+          symbol = '?';
+          break;
+
+        case 'History':
+          symbol = '?';
+          break;
+
+        case 'Horror':
+          symbol = '?';
+          break;
+
+        case 'Music':
+          symbol = '?';
+          break;
+
+        case 'Romance':
+          symbol = '?';
+          break;
+
+        case 'Sci-Fi':
+          symbol = '';
+          break;
+
+        default:
+          symbol = '?'
+          break;
+      }
+
+      $("#condition").text(symbol);
+      showCondition();
+    });
+    $("#nodeSlider").slider({
       value: nodeScale * 10,
       min: 1,
       max: 10,
@@ -86,7 +203,7 @@ div#linkSlider{
         reload();
       }
     });
-    $( "#linkSlider" ).slider({
+    $("#linkSlider").slider({
       value: linkDistance,
       min: 50,
       max: 600,
@@ -95,15 +212,97 @@ div#linkSlider{
         reload();
       }
     });
+    $("#yearSlider").slider({
+      value: year,
+      min: 1999,
+      max: 2016,
+      slide: function(event, ui) {
+        year = ui.value;
+        if (year == 1999)
+          $("#condition").text(`📅 ?`);
+        else
+          $("#condition").text(`📅 ${year}`);
 
-    loadJSON('movies.json', (allMovies) => {
+        showCondition();
+      }
+    });
+    $("#ratingSlider").slider({
+      value: rating * 10,
+      min: 60,
+      max: 90,
+      slide: function(event, ui) {
+        rating = ui.value / 10;
+        $("#condition").text(`👍 ${rating.toFixed(1)}`);
+        showCondition();
+      }
+    });
+
+    loadJSON('movies.json', (movies) => {
       loadJSON('actors.json', (actors) => {
-        const allActors = actors.actors;
-        const condition = { actor: 'Colin Firth' };
-        //const condition = { genre: 'Sci-Fi', rating: 8 };
-        const movies = filterBy(condition, allMovies);
-        graph = dataGenerator(movies, allActors);
+        allMovies = movies;
+        allActors = actors.actors;
 
+        const availableActor = allActors
+          .filter((actor) => (actor.photo != 'noPhoto.jpg'))
+          .map((actor) => (actor.name));
+
+        const availableDirector = [];
+        allMovies.map((movie) => (movie.director.split(',')))
+         .forEach((directories) => {
+            directories.forEach((director) => {
+              if (availableDirector.indexOf(director) < 0) {
+                availableDirector.push(director);
+              }
+            });
+         })
+         availableDirector.sort();
+
+        $("#actor").autocomplete({
+          source: availableActor,
+          minLength: 2,
+          select: function(event, ui) {
+            actor = ui.item.value;
+            $("#condition").text(`🎭 ${actor}`);
+            showCondition();
+            $(this).blur();
+          },
+          change: function( event, ui ) {
+            console.log('change')
+            if (!this.value.length) {
+              actor = '';
+              $("#condition").text(`🎭 ?`);
+              showCondition();
+            }
+          }
+        });
+
+        $("#director").autocomplete({
+          source: availableDirector,
+          minLength: 2,
+          select: function(event, ui) {
+            director = ui.item.value;
+            $("#condition").text(`🎥 ${director}`);
+            showCondition();
+            $(this).blur();
+          },
+          change: function( event, ui ) {
+            if (!this.value.length) {
+              director = '';
+              $("#condition").text(`🎥 ?`);
+              showCondition();
+            }
+          }
+        });
+
+        //actorList.autocomplete('option','change').call(actorList);
+        /*$("#actor").on("autocompletechange", function(event,ui) {
+          console.log('change', $(this).val());
+        });*/
+
+        //const condition = { genre: 'Sci-Fi', rating: 8 };
+        const condition = createCondition();
+        var result = filterBy(condition, allMovies);
+        graph = dataGenerator(result, allActors);
         drawSNA(graph);
       });
     });
