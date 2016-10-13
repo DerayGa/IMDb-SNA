@@ -134,7 +134,7 @@ movies.forEach((movie, index) => {
       if (!target.photo)
         return;
 
-      if (source.id == target.id) 
+      if (source.id == target.id)
         return;
 
       var link = sna.links.filter((link) => (
@@ -147,7 +147,7 @@ movies.forEach((movie, index) => {
         link = { source: source.id, target: target.id, value: 0};
         sna.links.push(link);
       }
-      
+
       link.value = (link.value) ? link.value*2 : 1;
     });
   });

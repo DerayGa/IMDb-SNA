@@ -48,7 +48,6 @@ label#condition{
   position:fixed;
   top:200px;
   width:100%;
-  z-index:100;
   color: #616161;
   font-size: 160px;
   text-align: center;
@@ -57,6 +56,16 @@ label#condition{
   overflow:hidden;
   background-color:rgba(255, 255, 255, 0.5);
   display: none;
+}
+label#resultInfo{
+  position:fixed;
+  top:80px;
+  left:10px;
+  width:80px;
+  color: #616161;
+  font-size: 50px;
+  text-align: left;
+  font-weight: bold;
 }
 div.ui-widget{
   display: inline-block;
