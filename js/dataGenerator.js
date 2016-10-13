@@ -8,7 +8,7 @@ const dataGenerator = (movies, allActors) => {
     links: []
   };
 
-  console.log('Movie:', movies.length);
+  //console.log('Movie:', movies.length);
 
   //change actors from string to array
   movies.forEach((movie, index) => {
@@ -46,7 +46,7 @@ const dataGenerator = (movies, allActors) => {
       group: 0,
     });
   });
-  console.log('Actors:', graph.nodes.length);
+  //console.log('Actors:', graph.nodes.length);
 
   movies.forEach((movie, index) => {
     movie.actors.forEach((sourceName) => {
@@ -59,7 +59,7 @@ const dataGenerator = (movies, allActors) => {
         if (!target.photo)
           return;
 
-        if (source.id == target.id) 
+        if (source.id == target.id)
           return;
 
         var link = graph.links.filter((link) => (
@@ -77,7 +77,18 @@ const dataGenerator = (movies, allActors) => {
       });
     });
   });
-  console.log('Links:', graph.links.length);
+  //console.log('Links:', graph.links.length);
+
+  $("#resultInfo").text(`🎬
+${movies.length}
+
+🎭
+${graph.nodes.length}
+${'   '}
+${'   '}
+↩
+${graph.links.length}`);
+
   return graph;
 }
 

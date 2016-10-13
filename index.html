@@ -12,7 +12,6 @@
 <script src="./js/moviesFilter.js"></script>
 
 <body>
-  <label id="condition"></label>
   <header>
     <span class="space">
     <div class="ui-widget">
@@ -25,16 +24,16 @@
     </div>
     <div class="ui-widget">
       <label>Actor:</label>
-      <input id="actor">
+      <input id="actor" placeholder="Actor">
     </div>
     <div class="ui-widget">
       <label>Director:</label>
-      <input id="director">
+      <input id="director" placeholder="Director">
     </div>
     <div class="ui-widget">
       <label>Genre:</label>
       <select id="genre">
-        <option selected="selected"></option>
+        <option selected="selected">All</option>
         <option>Action</option>
         <option>Adventure</option>
         <option>Biography</option>
@@ -58,7 +57,9 @@
       <label>Link:</label>
       <div id="linkSlider"></div>
     </div>
-  </footer>>
+  </footer>
+  <label id="condition"></label>
+  <label id="resultInfo"></label>
   <svg width="640" height="480"></svg>
 </body>
 
@@ -107,7 +108,7 @@
       condition.year = year;
     }
 
-    console.log(condition);
+    //console.log(condition);
 
     return condition;
   }
@@ -190,6 +191,10 @@
           break;
       }
 
+      if (symbol == '?') {
+        genre = '';
+      }
+
       $("#condition").text(symbol);
       showCondition();
     });
@@ -238,8 +243,8 @@
       }
     });
 
-    loadJSON('movies.json', (movies) => {
-      loadJSON('actors.json', (actors) => {
+    loadJSON('./data/movies.json', (movies) => {
+      loadJSON('./data/actors.json', (actors) => {
         allMovies = movies;
         allActors = actors.actors;
 
@@ -268,7 +273,6 @@
             $(this).blur();
           },
           change: function( event, ui ) {
-            console.log('change')
             if (!this.value.length) {
               actor = '';
               $("#condition").text(`🎭 ?`);
@@ -400,15 +404,15 @@
             .attr("y2", function(d) { return d.target.y; });
 
         gnode
-            .attr("x", function(d) { 
+            .attr("x", function(d) {
               //return d.x - nodeWidthRadius;
-              return d.x = Math.max(0, 
+              return d.x = Math.max(0,
                 Math.min(width - nodeWidthRadius * 2, d.x - nodeWidthRadius));
             })
             .attr("y", function(d) {
               //return d.y - nodeHeightRadius;
-              return d.y = Math.max(43, 
-                Math.min(height - nodeHeightRadius * 2, d.y - nodeHeightRadius));
+              return d.y = Math.max(43,
+                Math.min(height - nodeHeightRadius * 3, d.y - nodeHeightRadius) );
             });
       }
     //});
@@ -431,4 +435,5 @@
     }
   }
 
+  document.body.onselectstart=function(){if(event.srcElement.tagName==undefined)return event.returnValue=!1,!1;var n=event.srcElement.tagName.toLowerCase();if(n!="input"&&n!="textarea")return event.returnValue=!1,!1};
 </script>

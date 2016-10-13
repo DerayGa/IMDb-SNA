@@ -29,7 +29,7 @@ const filterBy = (condition, target) => {
   const keys = Object.keys(condition);
   let result = target;
 
-  keys.forEach((key) => {    
+  keys.forEach((key) => {
     result = this['filterBy' + capitalize(key)](condition[key], result);
   });
 

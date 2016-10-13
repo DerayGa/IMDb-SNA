@@ -3,9 +3,9 @@ const fs = require('fs');
 const jsdom = require('jsdom');
 const fetch = require('node-fetch');
 const decoder = require('./convertAllEscapes.js');
-const actors = require('../movies/actors.json').actors;
+const actors = require('../data/actors.json').actors;
 
-const rootDir = '../movies/';
+const rootDir = '../data/';
 var count = actors.length;
 
 const saveToJSON = () => {
