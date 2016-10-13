@@ -13,7 +13,6 @@
 
 <body>
   <header>
-    <span class="space">
     <div class="ui-widget">
       <label>Year:</label>
       <div id="yearSlider"></div>
@@ -411,7 +410,7 @@
             })
             .attr("y", function(d) {
               //return d.y - nodeHeightRadius;
-              return d.y = Math.max(43,
+              return d.y = Math.max(55,
                 Math.min(height - nodeHeightRadius * 3, d.y - nodeHeightRadius) );
             });
       }
