@@ -84,8 +84,9 @@ ${movies.length}
 
 🎭
 ${graph.nodes.length}
-
-➫
+${'   '}
+${'   '}
+↩
 ${graph.links.length}`);
 
   return graph;
