@@ -57,7 +57,6 @@ fs.readdirSync(photoDir)
 const condition = { actor: 'Leonardo DiCaprio' };//2015
 
 //const condition = { director: 'Christopher Nolan' };
-//const condition = { director: 'Christopher Nolan' };
 //const condition = { director: 'Steven Soderbergh' };//2000
 //const condition = { director: 'Ron Howard' };//2001
 //const condition = { director: 'Roman Polanski' };//2002

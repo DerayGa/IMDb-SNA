@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
+<link rel="stylesheet" type="text/css" href="./css/normalize.css">
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="./js/d3/d3.min.js"></script>
+<script src="./js/loadJSON.js"></script>
+<script src="./js/dataGenerator.js"></script>
+<script src="./js/moviesFilter.js"></script>
+
+<style>
+body {
+  overflow: hidden;
+}
 .links line {
   stroke: #999;
   stroke-opacity: 0.6;
@@ -16,22 +28,45 @@
   stroke: #fff;
   stroke-width: 1.5px;
 }
-
+header{
+  background-color: #2196F3;
+  width: 100%;
+  position: absolute;
+  padding: 10px;
+  height: 23px;
+}
+div#nodeSlider{
+  margin-left: 30px;
+  display: inline-block;
+  width: 120px;
+}
+div#linkSlider{
+  margin-left: 30px;
+  margin-right: 30px;
+  display: inline-block;
+  width: 120px;
+}
 </style>
 
 <body>
+  <header>
+    <button onclick="reload()">Reload</button>
+    <div id="nodeSlider"></div>
+    <div id="linkSlider"></div>
+  </header>
   <svg width="640" height="480"></svg>
-  <button onclick="reload()">GA</button>
 </body>
-
-<script src="./js/d3/d3.min.js"></script>
-<script src="./js/loadJSON.js"></script>
-<script src="./js/dataGenerator.js"></script>
-<script src="./js/moviesFilter.js"></script>
 
 <script>
   let graph;
   let svg;
+  let nodeScale = 0.5;
+  let nodeWidth = 89;
+  let nodeHeight = 132;
+  let linkDistance = 350;
+  let nodeWidthRadius = nodeWidth * nodeScale / 2;
+  let nodeHeightRadius = nodeHeight * nodeScale / 2;
+
   const reload = () => {
     svg.remove();
     svg = d3.selectAll("body").append("svg");
@@ -39,7 +74,28 @@
     drawSNA(graph);
   }
 
-  window.onload = () => {
+  $( function() {
+    $( "#nodeSlider" ).slider({
+      value: nodeScale * 10,
+      min: 1,
+      max: 10,
+      slide: function(event, ui) {
+        nodeScale = ui.value / 10.0;
+        nodeWidthRadius = nodeWidth * nodeScale / 2;
+        nodeHeightRadius = nodeHeight * nodeScale / 2;
+        reload();
+      }
+    });
+    $( "#linkSlider" ).slider({
+      value: linkDistance,
+      min: 50,
+      max: 600,
+      slide: function(event, ui) {
+        linkDistance = ui.value;
+        reload();
+      }
+    });
+
     loadJSON('movies.json', (allMovies) => {
       loadJSON('actors.json', (actors) => {
         const allActors = actors.actors;
@@ -51,28 +107,21 @@
         drawSNA(graph);
       });
     });
-  }
+  });
 
   const drawSNA = (graph) => {
 
-    const nodeScale = 0.3;
-    const nodeWidth = 89;
-    const nodeHeight = 132;
-    const linkDistance = 450;
-    const nodeWidthRadius = nodeWidth * nodeScale / 2;
-    const nodeHeightRadius = nodeHeight * nodeScale / 2;
-
-    var width = document.body.offsetWidth;
-    var height = document.body.offsetHeight;
+    var width = $(window).width();
+    var height = $(window).height();
 
     svg = d3.select("svg")
-                .attr("width", width)
-                .attr("height", height);
+              .attr("width", width)
+              .attr("height", height);
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
 
     var simulation = d3.forceSimulation()
-        .force("link", 
+        .force("link",
           d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; }))
         .force("charge", d3.forceManyBody().distanceMin(25).strength(-60))
         .force("center", d3.forceCenter(width / 2, height / 2))
@@ -153,12 +202,12 @@
         gnode
             .attr("x", function(d) { 
               //return d.x - nodeWidthRadius;
-              return d.x = Math.max(nodeWidthRadius, 
+              return d.x = Math.max(0, 
                 Math.min(width - nodeWidthRadius * 2, d.x - nodeWidthRadius));
             })
             .attr("y", function(d) {
               //return d.y - nodeHeightRadius;
-              return d.y = Math.max(nodeHeightRadius, 
+              return d.y = Math.max(43, 
                 Math.min(height - nodeHeightRadius * 2, d.y - nodeHeightRadius));
             });
       }

@@ -2,7 +2,7 @@
   "name": "imdb_sna",
   "version": "1.0.0",
   "description": "show imdb 2000~2016 movie, actor social network analysis",
-  "main": "index.js",
+  "main": "index.html",
   "directories": {
     "doc": "docs"
   },
