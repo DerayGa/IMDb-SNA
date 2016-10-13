@@ -3,7 +3,7 @@
 const imdb = require('imdb-api');
 const fs = require('fs');
 const path = require('path');
-const topMovie = require('../movies/top.json');
+const topMovie = require('../data/top.json');
 
 let targetMovieList = [];
 
@@ -11,7 +11,7 @@ Object.keys(topMovie).forEach((year) => {
   targetMovieList = targetMovieList.concat(topMovie[year]);
 });
 
-const dir = './movies/';
+const dir = './data/';
 let num = 1;
 const save_movie_to_json = (movieId) => {
   const existMovieList = fs.readdirSync(dir)

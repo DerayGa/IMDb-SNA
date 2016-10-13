@@ -1,5 +1,5 @@
 const loadJSON = (json, callback) => {
-  fetch(`../movies/${json}`).then((response) => (
+  fetch(`${json}`).then((response) => (
     response.json()
   )).then((json) => {
     return callback(json);

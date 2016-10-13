@@ -238,8 +238,8 @@
       }
     });
 
-    loadJSON('movies.json', (movies) => {
-      loadJSON('actors.json', (actors) => {
+    loadJSON('./data/movies.json', (movies) => {
+      loadJSON('./data/actors.json', (actors) => {
         allMovies = movies;
         allActors = actors.actors;
 

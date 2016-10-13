@@ -3,8 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 const moviesFilter = require('./moviesFilter.js');
-const allMovies = require('../movies/movies.json');
-const allActors = require('../movies/actors.json').actors;
+const allMovies = require('../data/movies.json');
+const allActors = require('../data/actors.json').actors;
 
 const rootDir = '../';
 const photoDir ='../res/photos/';

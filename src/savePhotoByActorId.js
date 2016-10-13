@@ -5,9 +5,9 @@ const jsdom = require('jsdom');
 var wget = require('wget');
 const fetch = require('node-fetch');
 
-const actors = require('../movies/actors.json').actors;
+const actors = require('../data/actors.json').actors;
 
-const rootDir = '../movies/';
+const rootDir = '../data/';
 const photoDir ='../res/photos/';
 var count = actors.length;
 
