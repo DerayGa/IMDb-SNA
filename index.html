@@ -118,25 +118,28 @@
     reload();
   }
   const reload = () => {
-    if(!svg) return;
+    if(svg)
+      svg.remove();
 
-    svg.remove();
     svg = d3.selectAll("body").append("svg");
 
     drawSNA(graph);
   }
 
-  const showCondition = () => {
+  const showCondition = (doSearch = true) => {
     $("#condition").fadeIn();
     clearTimeout(fadeOutFlag)
+    console.log('doSearch', doSearch)
     fadeOutFlag = setTimeout(() => {
       $("#condition").fadeOut("slow");
-      const condition = createCondition();
-      searchAndReload(condition);
+      if (doSearch) {
+        const condition = createCondition();
+        searchAndReload(condition);
+      }
     }, timer);
   }
   $( function() {
-    $("#genre").selectmenu({width: 150});
+    $("#genre").selectmenu({width: '60%'});
     $('#genre').on('selectmenuchange', function(){
       genre = this.value;
       let symbol;
@@ -305,9 +308,7 @@
 
         //const condition = { genre: 'Sci-Fi', rating: 8 };
         const condition = createCondition();
-        var result = filterBy(condition, allMovies);
-        graph = dataGenerator(result, allActors);
-        drawSNA(graph);
+        searchAndReload(condition);
       });
     });
   });
