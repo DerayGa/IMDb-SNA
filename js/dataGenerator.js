@@ -85,10 +85,13 @@ const dataGenerator = (movies, allActors) => {
   });
   //console.log('Links:', graph.links.length);
 
-  $("#resultInfo").text(`🎬
+  $("#resultInfo").text(`
+🎬
 ${movies.length}
+
 🎭
 ${graph.nodes.length}
+
 🔗
 ${graph.links.length}`);
 

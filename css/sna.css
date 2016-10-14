@@ -36,7 +36,7 @@ div#nodeSlider, div#linkSlider{
   margin-right: 30px;
   width: 200px;
 }
-div#ratingSlider, div#yearSlider{
+div#ratingSlider{
   display: inline-block;
   min-width: 50px;
   max-width: 150px;
@@ -88,4 +88,5 @@ label#resultInfo{
   font-size: 50px;
   text-align: left;
   font-weight: bold;
+  white-space: pre-wrap
 }
