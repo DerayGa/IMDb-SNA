@@ -1,6 +1,12 @@
 "use strict";
 
 const dataGenerator = (movies, allActors) => {
+  if (movies.length > 100) {
+      $("#condition").text(`Too many movies!`);
+      showCondition(false);
+      movies.length = 100;
+  }
+
   var actors = [];
 
   const graph = {
@@ -81,12 +87,9 @@ const dataGenerator = (movies, allActors) => {
 
   $("#resultInfo").text(`🎬
 ${movies.length}
-
 🎭
 ${graph.nodes.length}
-${'   '}
-${'   '}
-↩
+🔗
 ${graph.links.length}`);
 
   return graph;
