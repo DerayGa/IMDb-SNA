@@ -48,7 +48,7 @@ const createCondition = () => {
 
 const searchAndReload = (condition) => {
   var result = filterBy(condition, allMovies);
-  
+
   graph = dataGenerator(result, allActors);
   reload();
 }
@@ -61,16 +61,13 @@ const reload = () => {
   drawSNA(graph);
 }
 
-const showCondition = (doSearch = true) => {
+const showCondition = () => {
   $("#condition").fadeIn();
   clearTimeout(fadeOutFlag)
 
   fadeOutFlag = setTimeout(() => {
     $("#condition").fadeOut("slow");
-    if (doSearch) {
-      const condition = createCondition();
-      searchAndReload(condition);
-    }
+    searchAndReload(createCondition());
   }, timer);
 }
 $( function() {
@@ -231,14 +228,7 @@ $( function() {
         }
       });
 
-      //actorList.autocomplete('option','change').call(actorList);
-      /*$("#actor").on("autocompletechange", function(event,ui) {
-        console.log('change', $(this).val());
-      });*/
-
-      //const condition = { genre: 'Sci-Fi', rating: 8 };
-      const condition = createCondition();
-      searchAndReload(condition);
+      searchAndReload(createCondition());
     });
   });
 });
