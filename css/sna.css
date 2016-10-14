@@ -88,4 +88,5 @@ label#resultInfo{
   font-size: 50px;
   text-align: left;
   font-weight: bold;
+  white-space: pre-wrap
 }
