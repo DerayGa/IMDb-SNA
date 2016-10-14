@@ -3,7 +3,10 @@
 const dataGenerator = (movies, allActors) => {
   if (movies.length > 100) {
       $("#condition").text(`Too many movies!`);
-      showCondition(false);
+      $("#condition").fadeIn("slow");
+      setTimeout(() => {
+        $("#condition").fadeOut("slow");
+      }, 2500)
       movies.length = 100;
   }
 
