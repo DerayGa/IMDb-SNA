@@ -17,6 +17,7 @@ const filterByRating = (rating, target) => (
     (+movie.rating >= rating)
   ))
 );
+
 const filterByGenre = filterByKey('genres');
 const filterByActor = filterByKey('actors');
 const filterByDirector = filterByKey('director');

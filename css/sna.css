@@ -17,7 +17,6 @@ body {
   stroke-width: 1.5px;
 }
 header{
-  background-color: #2196F3;
   text-align: center;
   width: 100%;
   position: absolute;
@@ -39,11 +38,18 @@ div#nodeSlider, div#linkSlider{
   width: 200px;
   background-color: #2196F3;
 }
+div#nodeSlider .ui-slider-handle, div#linkSlider .ui-slider-handle{
+  background-color: #4CAF50;
+}
 div#ratingSlider{
   display: inline-block;
   min-width: 50px;
   max-width: 150px;
   width: 60%;
+  background-color: #2196F3;
+}
+div#ratingSlider .ui-slider-handle{
+  background-color: #4CAF50;
 }
 header div.ui-widget{
   display: inline-block;
@@ -68,6 +74,8 @@ input#actor, input#director{
   min-width: 50px;
   max-width: 150px;
   width: 60%;
+  /*color: #4CAF50;
+  background-color: #2196F3;*/
 }
 
 label#condition{
