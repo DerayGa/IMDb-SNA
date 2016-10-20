@@ -57,7 +57,7 @@ header div.ui-widget{
 }
 footer div.ui-widget{
   display: inline-block;
-  width: 40%;
+  width: 30%;
 }
 div.ui-widget label{
   width: 30%;
@@ -101,4 +101,8 @@ label#resultInfo{
   text-align: left;
   font-weight: bold;
   white-space: pre-wrap
+}
+.ui-selectmenu-open{
+  max-height: 450px;
+  overflow-y: scroll;
 }
