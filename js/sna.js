@@ -6,44 +6,42 @@ let linkDistance = 480;
 let nodeWidthRadius = nodeWidth * nodeScale / 2;
 let nodeHeightRadius = nodeHeight * nodeScale / 2;
 const timer = 1000;
+const minYear = 2000;
+const maxYear = 2016;
+const paradigms = [];
 
-let actor = '';
-let year = 2016;
-let genre = '';
-let director = '';
-let rating = 8;
 let condition;
+
 let graph;
 let allMovies;
 let allActors;
 
 let fadeOutFlag;
 const createCondition = () => {
-  condition = {};
+  const searchCondition = {};
+  const { actor, director, rating, genre, year } = condition
 
-  if (actor.length) {
-    condition.actor = actor;
+  if (actor && actor.length) {
+    searchCondition.actor = actor;
   }
 
-  if (director.length) {
-    condition.director = director;
+  if (director && director.length) {
+    searchCondition.director = director;
   }
 
   if (rating > 6) {
-    condition.rating = rating;
+    searchCondition.rating = rating;
   }
 
-  if (genre.length) {
-    condition.genre = genre;
+  if (genre && genre.length) {
+    searchCondition.genre = genre;
   }
 
-  if (year >= 2000 && year <= 2016) {
-    condition.year = year;
+  if (year >= minYear && year <= maxYear) {
+    searchCondition.year = year;
   }
 
-  //console.log(condition);
-
-  return condition;
+  return searchCondition;
 }
 
 const searchAndReload = (condition) => {
@@ -52,6 +50,7 @@ const searchAndReload = (condition) => {
   graph = dataGenerator(result, allActors);
   reload();
 }
+
 const reload = () => {
   if(svg)
     svg.remove();
@@ -61,30 +60,61 @@ const reload = () => {
   drawSNA(graph);
 }
 
+const applyConditionToUI = (condition) => {
+  const { actor, director, rating, genre, year } = condition
+
+  $("#actor").val(actor || '')
+  $("#director").val(director || '')
+  $("#year").val((year >= minYear && year <= maxYear) ? year : '?')
+  $("#year").selectmenu("refresh");
+  $("#genre").val(genre || '?')
+  $("#genre").selectmenu("refresh");
+  $("#ratingSlider").slider('value', rating * 10);
+}
+
 const showCondition = () => {
   $("#condition").fadeIn();
   clearTimeout(fadeOutFlag)
 
   fadeOutFlag = setTimeout(() => {
-    $("#condition").fadeOut("slow");
-    searchAndReload(createCondition());
+    $("#condition").fadeOut("slow", () => {
+      searchAndReload(createCondition());
+    });
   }, timer);
 }
-$( function() {
 
+const initYearOptions = () => {
+  for(let year = maxYear ; year >= minYear ; year--) {
+    $('#year').append($("<option></option>")
+                .text(year));
+  }
+
+  $("#year").val(condition.year);
   $("#year").selectmenu({width: '60%'});
   $('#year').on('selectmenuchange', function(){
-    year = this.value;
-    $("#condition").text(`📅 ${year}`);
-    year = +year;
+    $("#condition").text(`📅 ${this.value}`);
+    condition.year = +this.value;
     showCondition();
+  });
+}
+
+const initGenreOptions = () => {
+  const genres = ['Action', 'Adventure', 'Biography',
+          'Comedy', 'Crime', 'Fantasy', 'History',
+          'Horror', 'Music', 'Romance', 'Sci-Fi'];
+
+  genres.forEach((genre) => {
+     $('#genre').append($("<option></option>")
+                    .attr("value",genre)
+                    .text(genre));
+
   });
 
   $("#genre").selectmenu({width: '60%'});
   $('#genre').on('selectmenuchange', function(){
-    genre = this.value;
+    condition.genre = this.value;
     let symbol;
-    switch (genre){
+    switch (condition.genre){
       case 'Action':
         symbol = '💥';
         break;
@@ -131,16 +161,91 @@ $( function() {
 
       default:
         symbol = '?'
+        condition.genre = '';
         break;
-    }
-
-    if (symbol == '?') {
-      genre = '';
     }
 
     $("#condition").text(symbol);
     showCondition();
   });
+}
+
+const initSampleOptions = () => {
+  const actors = ['Christian Bale', 'Tom Cruise', 'Robert Downey Jr.',
+    'Daniel Radcliffe', 'Heath Ledger', 'Johnny Depp', 'Brad Pitt',
+    'Angelina Jolie'];
+
+  const oscarsActors = ['Russell Crowe/2000', 'Denzel Washington/2001',
+    'Adrien Brody/2002', 'Sean Penn/2003, 2008', 'Jamie Foxx/2004',
+    'Philip Seymour Hoffman/2005', 'Forest Whitaker/2006',
+    'Daniel Day-Lewis/2007, 2012', 'Jeff Bridges/2009', 'Colin Firth/2010',
+    'Jean Dujardin/2011', 'Matthew McConaughey/2013', 'Eddie Redmayne/2014',
+    'Leonardo DiCaprio/2015'];
+
+  const directors = ['Christopher Nolan' ];
+  const oscarsDirectors = ['Steven Soderbergh/2000' ,'Ron Howard/2001',
+    'Roman Polanski/2002', 'Peter Jackson/2003', 'Clint Eastwood/2004',
+    'Ang Lee/2005, 2012', 'Martin Scorsese/2006', 'Joel Coen/2007',
+    'Danny Boyle/2008', 'Kathryn Bigelow/2009', 'Tom Hooper/2010',
+    'Michel Hazanavicius/2011', 'Alfonso Cuarón/2013',
+    'Alejandro G. Iñárritu/2014, 2015'];
+
+  const topGenre = ['Action', 'Adventure', 'Biography',
+          'Comedy', 'Crime', 'Fantasy', 'History',
+          'Horror', 'Music', 'Romance', 'Sci-Fi'];
+
+  const rating = 8.0;
+
+  actors.forEach((actor) => {
+    paradigms.push({value: { actor: actor }, text: actor});
+  });
+  oscarsActors.forEach((actor) => {
+    const info = actor.split('/');
+    paradigms.push({value: { actor: info[0] }, text: `${info[0]} (${info[1]})`});
+  });
+
+  directors.forEach((director) => {
+    paradigms.push({value: { director: director }, text: director});
+  });
+  oscarsDirectors.forEach((director) => {
+    const info = director.split('/');
+    paradigms.push({value: { director: info[0] }, text: `${info[0]} (${info[1]})`});
+  });
+  topGenre.forEach((genre) => {
+    paradigms.push({value: { genre: genre, rating: rating }, text: `${genre} ${rating}+`});
+  });
+
+  for(let year = maxYear ; year >= minYear ; year--) {
+    paradigms.push({value: { year: year, rating: rating }, text: `${year} ${rating}+`});
+  }
+
+  paradigms.forEach((paradigm) => {
+    $('#paradigm').append($("<option></option>")
+                  .attr("value", JSON.stringify(paradigm.value))
+                  .text(paradigm.text));
+  });
+
+  $("#paradigm").val("");
+  $("#paradigm").selectmenu({
+    width: '60%',
+    position: { my: "left bottom", at: "left top", collision: "none" }
+  });
+
+  $('#paradigm').on('selectmenuchange', function(){
+    condition = Object.assign({
+      actor: '',
+      director: '',
+      rating: 0,
+      year: 0,
+      genre: '',}, JSON.parse(this.value));
+    applyConditionToUI(condition);
+    searchAndReload(createCondition());
+  });
+
+  //random show paradigm
+}
+
+const initNodeSlider = () => {
   $("#nodeSlider").slider({
     value: nodeScale * 10,
     min: 1,
@@ -152,6 +257,9 @@ $( function() {
       reload();
     }
   });
+}
+
+const initLinkSlider = () => {
   $("#linkSlider").slider({
     value: linkDistance,
     min: 50,
@@ -161,16 +269,63 @@ $( function() {
       reload();
     }
   });
+}
+
+const initRatingSlider = () => {
   $("#ratingSlider").slider({
-    value: rating * 10,
+    value: condition.rating * 10,
     min: 60,
     max: 90,
     slide: function(event, ui) {
-      rating = ui.value / 10;
-      $("#condition").text(`👍 ${rating.toFixed(1)}`);
+      condition.rating = ui.value / 10;
+      $("#condition").text(`👍 ${condition.rating.toFixed(1)}`);
       showCondition();
     }
   });
+}
+
+const initActorInput = (availableActor) => {
+  $("#actor").autocomplete({
+    source: availableActor,
+    minLength: 2,
+    select: function(event, ui) {
+      condition.actor = ui.item.value;
+      $("#condition").text(`🎭 ${condition.actor}`);
+      showCondition();
+      $(this).blur();
+    },
+    change: function( event, ui ) {
+      if (!this.value.length) {
+        condition.actor = '';
+        $("#condition").text(`🎭 ?`);
+        showCondition();
+      }
+    }
+  });
+}
+
+const initDirectorInput = (availableDirector) => {
+  $("#director").autocomplete({
+    source: availableDirector,
+    minLength: 2,
+    select: function(event, ui) {
+      condition.director = ui.item.value;
+      $("#condition").text(`🎥 ${condition.director}`);
+      showCondition();
+      $(this).blur();
+    },
+    change: function( event, ui ) {
+      if (!this.value.length) {
+        condition.director = '';
+        $("#condition").text(`🎥 ?`);
+        showCondition();
+      }
+    }
+  });
+}
+
+$(() => {
+  initSampleOptions();
 
   loadJSON('./data/movies.json', (movies) => {
     loadJSON('./data/actors.json', (actors) => {
@@ -189,45 +344,20 @@ $( function() {
               availableDirector.push(director);
             }
           });
-       })
-       availableDirector.sort();
+      })
+      availableDirector.sort();
 
-      $("#actor").autocomplete({
-        source: availableActor,
-        minLength: 2,
-        select: function(event, ui) {
-          actor = ui.item.value;
-          $("#condition").text(`🎭 ${actor}`);
-          showCondition();
-          $(this).blur();
-        },
-        change: function( event, ui ) {
-          if (!this.value.length) {
-            actor = '';
-            $("#condition").text(`🎭 ?`);
-            showCondition();
-          }
-        }
-      });
+      condition = paradigms[Math.floor(Math.random() * paradigms.length)].value;
 
-      $("#director").autocomplete({
-        source: availableDirector,
-        minLength: 2,
-        select: function(event, ui) {
-          director = ui.item.value;
-          $("#condition").text(`🎥 ${director}`);
-          showCondition();
-          $(this).blur();
-        },
-        change: function( event, ui ) {
-          if (!this.value.length) {
-            director = '';
-            $("#condition").text(`🎥 ?`);
-            showCondition();
-          }
-        }
-      });
+      initYearOptions();
+      initGenreOptions();
+      initNodeSlider();
+      initLinkSlider();
+      initRatingSlider();
+      initActorInput(availableActor);
+      initDirectorInput(availableDirector);
 
+      applyConditionToUI(condition);
       searchAndReload(createCondition());
     });
   });
