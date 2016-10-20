@@ -1,13 +1,15 @@
 "use strict";
 
+const maximumMovie = 100;
+
 const dataGenerator = (movies, allActors) => {
-  if (movies.length > 100) {
-      $("#condition").text(`Too many movies!`);
-      $("#condition").fadeIn("slow");
+  if (movies.length > maximumMovie) {
+      $("#condition").text('Too many movies!');
+      $("#condition").fadeIn();
       setTimeout(() => {
         $("#condition").fadeOut("slow");
-      }, 2500)
-      movies.length = 100;
+      }, timer);
+      movies.length = maximumMovie;
   }
 
   var actors = [];
@@ -16,8 +18,6 @@ const dataGenerator = (movies, allActors) => {
     nodes: [],
     links: []
   };
-
-  //console.log('Movie:', movies.length);
 
   //change actors from string to array
   movies.forEach((movie, index) => {
@@ -55,7 +55,6 @@ const dataGenerator = (movies, allActors) => {
       group: 0,
     });
   });
-  //console.log('Actors:', graph.nodes.length);
 
   movies.forEach((movie, index) => {
     movie.actors.forEach((sourceName) => {
@@ -86,8 +85,14 @@ const dataGenerator = (movies, allActors) => {
       });
     });
   });
-  //console.log('Links:', graph.links.length);
 
+  if (movies.length == 0) {
+    $("#condition").text('No movies!');
+    $("#condition").fadeIn();
+    setTimeout(() => {
+      $("#condition").fadeOut("slow");
+    }, timer);
+  }
   $("#resultInfo").text(`
 🎬
 ${movies.length}

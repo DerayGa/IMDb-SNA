@@ -6,15 +6,11 @@ let linkDistance = 480;
 let nodeWidthRadius = nodeWidth * nodeScale / 2;
 let nodeHeightRadius = nodeHeight * nodeScale / 2;
 const timer = 1000;
+const minYear = 2000;
+const maxYear = 2016;
+const paradigms = [];
 
-let condition = {
-  actor: '',
-  director: '',
-  rating: 8,
-  year: 2013,
-  genre: '',
-};
-
+let condition;
 
 let graph;
 let allMovies;
@@ -22,13 +18,14 @@ let allActors;
 
 let fadeOutFlag;
 const createCondition = () => {
-  let searchCondition = {};
+  const searchCondition = {};
   const { actor, director, rating, genre, year } = condition
-  if (actor.length) {
+
+  if (actor && actor.length) {
     searchCondition.actor = actor;
   }
 
-  if (director.length) {
+  if (director && director.length) {
     searchCondition.director = director;
   }
 
@@ -36,11 +33,11 @@ const createCondition = () => {
     searchCondition.rating = rating;
   }
 
-  if (genre.length) {
+  if (genre && genre.length) {
     searchCondition.genre = genre;
   }
 
-  if (year >= 2000 && year <= 2016) {
+  if (year >= minYear && year <= maxYear) {
     searchCondition.year = year;
   }
 
@@ -68,18 +65,11 @@ const applyConditionToUI = (condition) => {
 
   $("#actor").val(actor || '')
   $("#director").val(director || '')
-  $("#year").val((year >= 2000 && year <= 2016) ? year : '?')
+  $("#year").val((year >= minYear && year <= maxYear) ? year : '?')
   $("#year").selectmenu("refresh");
   $("#genre").val(genre || '?')
   $("#genre").selectmenu("refresh");
   $("#ratingSlider").slider('value', rating * 10);
-/*
-
-
-  if (condition.rating > 6) {
-    searchCondition.rating = condition.rating;
-  }
-*/
 }
 
 const showCondition = () => {
@@ -87,13 +77,14 @@ const showCondition = () => {
   clearTimeout(fadeOutFlag)
 
   fadeOutFlag = setTimeout(() => {
-    $("#condition").fadeOut("slow");
-    searchAndReload(createCondition());
+    $("#condition").fadeOut("slow", () => {
+      searchAndReload(createCondition());
+    });
   }, timer);
 }
 
 const initYearOptions = () => {
-  for(let year = 2016 ; year >= 2000 ; year--) {
+  for(let year = maxYear ; year >= minYear ; year--) {
     $('#year').append($("<option></option>")
                 .text(year));
   }
@@ -179,7 +170,7 @@ const initGenreOptions = () => {
   });
 }
 
-const initSampleptions = () => {
+const initSampleOptions = () => {
   const actors = ['Christian Bale', 'Tom Cruise', 'Robert Downey Jr.',
     'Daniel Radcliffe', 'Heath Ledger', 'Johnny Depp', 'Brad Pitt',
     'Angelina Jolie'];
@@ -203,43 +194,44 @@ const initSampleptions = () => {
           'Comedy', 'Crime', 'Fantasy', 'History',
           'Horror', 'Music', 'Romance', 'Sci-Fi'];
 
-  const samples = [];
   const rating = 8.0;
 
   actors.forEach((actor) => {
-    samples.push({value: { actor: actor }, text: actor});
+    paradigms.push({value: { actor: actor }, text: actor});
   });
   oscarsActors.forEach((actor) => {
     const info = actor.split('/');
-    samples.push({value: { actor: info[0] }, text: `${info[0]} (${info[1]})`});
+    paradigms.push({value: { actor: info[0] }, text: `${info[0]} (${info[1]})`});
   });
 
   directors.forEach((director) => {
-    samples.push({value: { director: director }, text: director});
+    paradigms.push({value: { director: director }, text: director});
   });
   oscarsDirectors.forEach((director) => {
     const info = director.split('/');
-    samples.push({value: { director: info[0] }, text: `${info[0]} (${info[1]})`});
+    paradigms.push({value: { director: info[0] }, text: `${info[0]} (${info[1]})`});
   });
   topGenre.forEach((genre) => {
-    samples.push({value: { genre: genre, rating: rating }, text: `${genre} ${rating}+`});
+    paradigms.push({value: { genre: genre, rating: rating }, text: `${genre} ${rating}+`});
   });
 
-  for(let year = 2016 ; year >= 2000 ; year--) {
-    samples.push({value: { year: year, rating: rating }, text: `${year} ${rating}+`});
+  for(let year = maxYear ; year >= minYear ; year--) {
+    paradigms.push({value: { year: year, rating: rating }, text: `${year} ${rating}+`});
   }
 
-  samples.forEach((sample) => {
-    $('#sample').append($("<option></option>")
-                  .attr("value", JSON.stringify(sample.value))
-                  .text(sample.text));
+  paradigms.forEach((paradigm) => {
+    $('#paradigm').append($("<option></option>")
+                  .attr("value", JSON.stringify(paradigm.value))
+                  .text(paradigm.text));
   });
-  $("#sample").val("");
-  $("#sample").selectmenu({
+
+  $("#paradigm").val("");
+  $("#paradigm").selectmenu({
     width: '60%',
     position: { my: "left bottom", at: "left top", collision: "none" }
   });
-  $('#sample').on('selectmenuchange', function(){
+
+  $('#paradigm').on('selectmenuchange', function(){
     condition = Object.assign({
       actor: '',
       director: '',
@@ -248,17 +240,12 @@ const initSampleptions = () => {
       genre: '',}, JSON.parse(this.value));
     applyConditionToUI(condition);
     searchAndReload(createCondition());
-    //$("#condition").text(`📅 ${this.value}`);
-    //condition.year = +this.value;
-    //showCondition();
   });
+
+  //random show paradigm
 }
 
-$(() => {
-  initYearOptions();
-  initGenreOptions();
-  initSampleptions();
-
+const initNodeSlider = () => {
   $("#nodeSlider").slider({
     value: nodeScale * 10,
     min: 1,
@@ -270,6 +257,9 @@ $(() => {
       reload();
     }
   });
+}
+
+const initLinkSlider = () => {
   $("#linkSlider").slider({
     value: linkDistance,
     min: 50,
@@ -279,6 +269,9 @@ $(() => {
       reload();
     }
   });
+}
+
+const initRatingSlider = () => {
   $("#ratingSlider").slider({
     value: condition.rating * 10,
     min: 60,
@@ -289,6 +282,50 @@ $(() => {
       showCondition();
     }
   });
+}
+
+const initActorInput = (availableActor) => {
+  $("#actor").autocomplete({
+    source: availableActor,
+    minLength: 2,
+    select: function(event, ui) {
+      condition.actor = ui.item.value;
+      $("#condition").text(`🎭 ${condition.actor}`);
+      showCondition();
+      $(this).blur();
+    },
+    change: function( event, ui ) {
+      if (!this.value.length) {
+        condition.actor = '';
+        $("#condition").text(`🎭 ?`);
+        showCondition();
+      }
+    }
+  });
+}
+
+const initDirectorInput = (availableDirector) => {
+  $("#director").autocomplete({
+    source: availableDirector,
+    minLength: 2,
+    select: function(event, ui) {
+      condition.director = ui.item.value;
+      $("#condition").text(`🎥 ${condition.director}`);
+      showCondition();
+      $(this).blur();
+    },
+    change: function( event, ui ) {
+      if (!this.value.length) {
+        condition.director = '';
+        $("#condition").text(`🎥 ?`);
+        showCondition();
+      }
+    }
+  });
+}
+
+$(() => {
+  initSampleOptions();
 
   loadJSON('./data/movies.json', (movies) => {
     loadJSON('./data/actors.json', (actors) => {
@@ -307,45 +344,20 @@ $(() => {
               availableDirector.push(director);
             }
           });
-       })
-       availableDirector.sort();
+      })
+      availableDirector.sort();
 
-      $("#actor").autocomplete({
-        source: availableActor,
-        minLength: 2,
-        select: function(event, ui) {
-          condition.actor = ui.item.value;
-          $("#condition").text(`🎭 ${condition.actor}`);
-          showCondition();
-          $(this).blur();
-        },
-        change: function( event, ui ) {
-          if (!this.value.length) {
-            condition.actor = '';
-            $("#condition").text(`🎭 ?`);
-            showCondition();
-          }
-        }
-      });
+      condition = paradigms[Math.floor(Math.random() * paradigms.length)].value;
 
-      $("#director").autocomplete({
-        source: availableDirector,
-        minLength: 2,
-        select: function(event, ui) {
-          condition.director = ui.item.value;
-          $("#condition").text(`🎥 ${condition.director}`);
-          showCondition();
-          $(this).blur();
-        },
-        change: function( event, ui ) {
-          if (!this.value.length) {
-            condition.director = '';
-            $("#condition").text(`🎥 ?`);
-            showCondition();
-          }
-        }
-      });
+      initYearOptions();
+      initGenreOptions();
+      initNodeSlider();
+      initLinkSlider();
+      initRatingSlider();
+      initActorInput(availableActor);
+      initDirectorInput(availableDirector);
 
+      applyConditionToUI(condition);
       searchAndReload(createCondition());
     });
   });
