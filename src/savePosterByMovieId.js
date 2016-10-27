@@ -3,7 +3,6 @@ const fs = require('fs');
 const request = require('request');
 const path = require('path');
 const jsdom = require('jsdom');
-var wget = require('wget');
 const fetch = require('node-fetch');
 
 const movies = require('../data/movies.json');
@@ -31,8 +30,8 @@ const checkCompleted = () => {
 
 const download = (uri, filename, callback) => {
   request.head(uri, (err, res, body) => {
-    console.log('content-type:', res.headers['content-type']);
-    console.log('content-length:', res.headers['content-length']);
+    //console.log('content-type:', res.headers['content-type']);
+    //console.log('content-length:', res.headers['content-length']);
 
     request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
   });
