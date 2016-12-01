@@ -417,7 +417,7 @@ const drawSNA = (graph) => {
 
   var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){ return d.id; });
 
-  var gnode = node.enter().append("svg")
+  var gnode = node.enter().append("g")
     /*.attr("width", function(d) {
       return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
     })
@@ -436,30 +436,27 @@ const drawSNA = (graph) => {
       .attr("width", "100%")
       .attr("height", "100%")
     .append("image")
+      .attr("x", 0)
+      .attr("y", 0)
       .attr("width", function(d) {
-        return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+        return (nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale)).toFixed(1);
       })
       .attr("height", function(d) {
-        return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+        return (nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale)).toFixed(1);
       })
       .attr("xlink:href", function(d){
         const photoPath = (d.type === 'actor') ? 'photos' : 'posters'
         return `./res/${photoPath}/${d.photo}`;
       });
 
-  /*gnode.append("circle")
-        .attr("r", 25)
-        .attr("cx", 25)
-        .attr("cy", 25)
-        .style("fill", function(d){ return "url(#image"+d.id+")"; } )*/
   gnode.append("rect")
     .attr("width", function(d) {
-      return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+      return (nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale)).toFixed(1);
     })
     .attr("height", function(d) {
-      return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+      return (nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale)).toFixed(1);
     })
-    .style("stroke-width", 5)
+    .style("stroke-width", 4)
     .style("stroke", function(d) {
       return (d.type === 'actor') ? '#2196F3' : '#F44336';
     })
@@ -469,7 +466,7 @@ const drawSNA = (graph) => {
   gnode.append("text")
     .attr("dx", 0)
     .attr("dy", function(d) {
-      return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + 20;
+      return (nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + 20).toFixed(1);
     })
     .attr("text-anchor", "start")
     .text(function(d) { return d.name; });
@@ -492,16 +489,29 @@ const drawSNA = (graph) => {
       .attr("y2", function(d) { return d.target.y; });
 
     gnode
+      .attr("transform", function(d) {
+        const scale = (d.type === 'actor') ? 1 : posterScale;
+        d.x = Math.max(0,
+          Math.min(width - nodeWidthRadius * 2 * scale, d.x - nodeWidthRadius * scale)
+        );
+        d.y = Math.max(0,
+          Math.min(height - nodeHeightRadius * 2 * scale, d.y - nodeHeightRadius * scale)
+        );
+        return "translate(" + d.x + "," + d.y + ")";
+    });
+    /*gnode
       .attr("x", function(d) {
-        const scale = (d.group == 0) ? 1 : posterScale;
+        const scale = (d.type === 'actor') ? 1 : posterScale;
         return d.x = Math.max(0,
-          Math.min(width - nodeWidthRadius * 2 * scale, d.x - nodeWidthRadius * scale));
+          Math.min(width - nodeWidthRadius * 2 * scale, d.x - nodeWidthRadius * scale)
+        );
       })
       .attr("y", function(d) {
-        const scale = (d.group == 0) ? 1 : posterScale;
+        const scale = (d.type === 'actor') ? 1 : posterScale;
         return d.y = Math.max(0,
-          Math.min(height - nodeHeightRadius * 2 * scale, d.y - nodeHeightRadius * scale) );
-      });
+          Math.min(height - nodeHeightRadius * 2 * scale, d.y - nodeHeightRadius * scale)
+        );
+      });*/
   }
 
   function dragstarted(d) {

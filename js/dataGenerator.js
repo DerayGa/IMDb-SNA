@@ -177,7 +177,7 @@ const dataGenerator2mode = (movies, allActors) => {
       if (!target.photo)
         return;
 
-        graph.links.push({ source: movie.imdbid, target: target.id, value: 1});
+        graph.links.push({ source: movie.imdbid, target: target.id, value: 2});
     });
   });
 
