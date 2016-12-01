@@ -1,22 +1,22 @@
 const nodeWidth = 89;
 const nodeHeight = 132;
-let svg;
-let nodeScale = 0.7;
-let linkDistance = 480;
-let nodeWidthRadius = nodeWidth * nodeScale / 2;
-let nodeHeightRadius = nodeHeight * nodeScale / 2;
 const timer = 1000;
 const minYear = 2000;
 const maxYear = 2016;
 const paradigms = [];
+const posterScale = 1.5;
+let nodeScale = 0.7;
+let linkDistance = 480;
+let nodeWidthRadius = nodeWidth * nodeScale / 2;
+let nodeHeightRadius = nodeHeight * nodeScale / 2;
 
+let svg;
 let condition;
-
 let graph;
 let allMovies;
 let allActors;
-
 let fadeOutFlag;
+
 const createCondition = () => {
   const searchCondition = {};
   const { actor, director, rating, genre, year } = condition
@@ -47,7 +47,9 @@ const createCondition = () => {
 const searchAndReload = (condition) => {
   var result = filterBy(condition, allMovies);
 
-  graph = dataGenerator(result, allActors);
+  //graph = dataGenerator(result, allActors);
+  graph = dataGenerator2mode(result, allActors);
+
   reload();
 }
 
@@ -327,8 +329,8 @@ const initDirectorInput = (availableDirector) => {
 $(() => {
   initSampleOptions();
 
-  loadJSON('./data/movies.json', (movies) => {
-    loadJSON('./data/actors.json', (actors) => {
+  loadJSON(`./data/movies.json?${new Date().valueOf()}`, (movies) => {
+    loadJSON(`./data/actors.json?${new Date().valueOf()}`, (actors) => {
       allMovies = movies;
       allActors = actors.actors;
 
@@ -364,15 +366,26 @@ $(() => {
 });
 
 const drawSNA = (graph) => {
+  const svgTop = $('header').height()
+    + Number($('header').css('padding-top').replace('px', ''))
+    + Number($('header').css('padding-bottom').replace('px', ''));
+  const svgLeft = $('#resultInfo').width() - Number($('#resultInfo').css('left').replace('px', ''));
+  const svgBottom = $('footer').height()
+    + Number($('footer').css('padding-top').replace('px', ''))
+    + Number($('footer').css('padding-bottom').replace('px', ''));
+  const svgRight = 0;
 
-  var width = $(window).width();
-  var height = $(window).height();
+  var width = $(window).width() - svgLeft;
+  var height = $(window).height() - svgTop - svgBottom;
 
   svg = d3.select("svg")
             .attr("width", width)
-            .attr("height", height);
-
-  var color = d3.scaleOrdinal(d3.schemeCategory20);
+            .attr("height", height)
+            .style("top", svgTop)
+            .style("left", svgLeft)
+            .style("bottom", svgBottom)
+            .style("right", svgRight);
+  //var color = d3.scaleOrdinal(d3.schemeCategory20);
 
   var simulation = d3.forceSimulation()
       .force("link",
@@ -397,23 +410,34 @@ const drawSNA = (graph) => {
   var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){ return d.id; });
 
   var gnode = node.enter().append("svg")
-      .attr("width", nodeWidth * nodeScale)
-      .attr("height", nodeHeight * nodeScale)
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
+    /*.attr("width", function(d) {
+      return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+    })
+    .attr("height", function(d) {
+      return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+    })*/
+    .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
 
   gnode.append("defs")
-      .append("pattern")
-        .attr("id", function(d){ return "image"+d.id; } )
-        .attr("patternUnits", "objectBoundingBox")
-        .attr("width", "100%")
-        .attr("height", "100%")
-      .append("image")
-        .attr("width", nodeWidth * nodeScale)
-        .attr("height", nodeHeight * nodeScale)
-        .attr("xlink:href", function(d){ return "./res/photos/"+d.photo; } )
+    .append("pattern")
+      .attr("id", function(d){ return `image${d.id}`; } )
+      .attr("patternUnits", "objectBoundingBox")
+      .attr("width", "100%")
+      .attr("height", "100%")
+    .append("image")
+      .attr("width", function(d) {
+        return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+      })
+      .attr("height", function(d) {
+        return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+      })
+      .attr("xlink:href", function(d){
+        const photoPath = (d.type === 'actor') ? 'photos' : 'posters'
+        return `./res/${photoPath}/${d.photo}`;
+      });
 
   /*gnode.append("circle")
         .attr("r", 25)
@@ -421,46 +445,55 @@ const drawSNA = (graph) => {
         .attr("cy", 25)
         .style("fill", function(d){ return "url(#image"+d.id+")"; } )*/
   gnode.append("rect")
-        .attr("width", nodeWidth * nodeScale)
-        .attr("height", nodeHeight * nodeScale)
-        .style("fill", function(d){ return "url(#image"+d.id+")"; } )
-      //.attr("fill", function(d) { return color(d.group); })
-
-  /*gnode.append("image")
-    .attr("x", "10")
-    .attr("y", "3")
-    .attr("width", "30")
-    .attr("height", "44")
-    .attr("xlink:href", function(d){ return "./res/photos/"+d.photo; } );*/
+    .attr("width", function(d) {
+      return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+    })
+    .attr("height", function(d) {
+      return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
+    })
+    .style("stroke-width", 5)
+    .style("stroke", function(d) {
+      return (d.type === 'actor') ? '#2196F3' : '#F44336';
+    })
+    .style("fill", function(d){
+      return `url(#image${d.id})`;
+    });
+  gnode.append("text")
+    .attr("dx", 0)
+    .attr("dy", function(d) {
+      return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + 20;
+    })
+    .attr("text-anchor", "start")
+    .text(function(d) { return d.name; });
 
   gnode.append("title")
-      .text(function(d) { return d.name; });
+    .text(function(d) { return d.name; });
 
   simulation
-      .nodes(graph.nodes)
-      .on("tick", ticked);
+    .nodes(graph.nodes)
+    .on("tick", ticked);
 
   simulation.force("link")
-      .links(graph.links);
+    .links(graph.links);
 
   function ticked() {
     links
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
 
     gnode
-        .attr("x", function(d) {
-          //return d.x - nodeWidthRadius;
-          return d.x = Math.max(0,
-            Math.min(width - nodeWidthRadius * 2, d.x - nodeWidthRadius));
-        })
-        .attr("y", function(d) {
-          //return d.y - nodeHeightRadius;
-          return d.y = Math.max(55,
-            Math.min(height - nodeHeightRadius * 3, d.y - nodeHeightRadius) );
-        });
+      .attr("x", function(d) {
+        const scale = (d.group == 0) ? 1 : posterScale;
+        return d.x = Math.max(0,
+          Math.min(width - nodeWidthRadius * 2 * scale, d.x - nodeWidthRadius * scale));
+      })
+      .attr("y", function(d) {
+        const scale = (d.group == 0) ? 1 : posterScale;
+        return d.y = Math.max(0,
+          Math.min(height - nodeHeightRadius * 2 * scale, d.y - nodeHeightRadius * scale) );
+      });
   }
 
   function dragstarted(d) {
