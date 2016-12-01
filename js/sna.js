@@ -7,7 +7,7 @@ const paradigms = [];
 const posterScale = 1.5;
 const collideGap = 1;
 let nodeScale = 0.7;
-let linkDistance = 480;
+let linkDistance = 250;
 let nodeWidthRadius = nodeWidth * nodeScale / 2;
 let nodeHeightRadius = nodeHeight * nodeScale / 2;
 
@@ -54,11 +54,24 @@ const searchAndReload = (condition) => {
   reload();
 }
 
+let width;
+let height;
 const reload = () => {
   if(svg)
     svg.remove();
 
-  svg = d3.selectAll("body").append("svg");
+  width = $(window).width() - svgLeft;
+  height = $(window).height() - svgTop - svgBottom;
+
+  svg = d3
+    .selectAll(".svgContainer")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("top", svgTop)
+    .style("left", svgLeft)
+    .style("bottom", svgBottom)
+    .style("right", svgRight);
 
   drawSNA(graph);
 }
@@ -72,7 +85,7 @@ const applyConditionToUI = (condition) => {
   $("#year").selectmenu("refresh");
   $("#genre").val(genre || '?')
   $("#genre").selectmenu("refresh");
-  $("#ratingSlider").slider('value', rating * 10);
+  $("#ratingSlider").slider('value', (rating || 0) * 10);
 }
 
 const showCondition = () => {
@@ -86,9 +99,16 @@ const showCondition = () => {
   }, timer);
 }
 
+const initModeCheckButton = () => {
+  $(".common:checkbox").switchbutton({
+    checkedLabel: '1 mode',
+    uncheckedLabel: '2 mode'
+  });
+}
+
 const initYearOptions = () => {
   for(let year = maxYear ; year >= minYear ; year--) {
-    $('#year').append($("<option></option>")
+    $("#year").append($("<option></option>")
                 .text(year));
   }
 
@@ -276,7 +296,7 @@ const initLinkSlider = () => {
 
 const initRatingSlider = () => {
   $("#ratingSlider").slider({
-    value: condition.rating * 10,
+    value: (condition.rating || 0) * 10,
     min: 60,
     max: 90,
     slide: function(event, ui) {
@@ -327,7 +347,20 @@ const initDirectorInput = (availableDirector) => {
   });
 }
 
+let svgTop;
+let svgLeft;
+let svgBottom;
+let svgRight;
 $(() => {
+  svgTop = $('header').height()
+    + Number($('header').css('padding-top').replace('px', ''))
+    + Number($('header').css('padding-bottom').replace('px', ''));
+  svgLeft = $('#resultInfo').width() - Number($('#resultInfo').css('left').replace('px', ''));
+  svgBottom = $('footer').height()
+    + Number($('footer').css('padding-top').replace('px', ''))
+    + Number($('footer').css('padding-bottom').replace('px', ''));
+  svgRight = 0;
+
   initSampleOptions();
 
   loadJSON(`./data/movies.json?${new Date().valueOf()}`, (movies) => {
@@ -350,8 +383,10 @@ $(() => {
       })
       availableDirector.sort();
 
-      condition = paradigms[Math.floor(Math.random() * paradigms.length)].value;
+      //condition = paradigms[Math.floor(Math.random() * paradigms.length)].value;
+      condition = paradigms[1].value;
 
+      initModeCheckButton();
       initYearOptions();
       initGenreOptions();
       initNodeSlider();
@@ -366,45 +401,13 @@ $(() => {
   });
 });
 
+let gnode;
+let links;
 const drawSNA = (graph) => {
-  const svgTop = $('header').height()
-    + Number($('header').css('padding-top').replace('px', ''))
-    + Number($('header').css('padding-bottom').replace('px', ''));
-  const svgLeft = $('#resultInfo').width() - Number($('#resultInfo').css('left').replace('px', ''));
-  const svgBottom = $('footer').height()
-    + Number($('footer').css('padding-top').replace('px', ''))
-    + Number($('footer').css('padding-bottom').replace('px', ''));
-  const svgRight = 0;
+  var glinks = svg.append("g").attr("class", "links");
 
-  var width = $(window).width() - svgLeft;
-  var height = $(window).height() - svgTop - svgBottom;
-
-  svg = d3.select("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .style("top", svgTop)
-            .style("left", svgLeft)
-            .style("bottom", svgBottom)
-            .style("right", svgRight);
-  //var color = d3.scaleOrdinal(d3.schemeCategory20);
-
-  var simulation = d3.forceSimulation()
-      .velocityDecay(0.2)
-      .force("link",
-        d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; })
-      )
-      .force("charge", d3.forceManyBody().distanceMin(25).strength(-60))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collide", d3.forceCollide().radius(
-        function(d) {
-          return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + collideGap;
-        }
-      ).iterations(2));
-
-  var glinks = svg.append("g")
-      .attr("class", "links");
-
-  var links = glinks.selectAll()
+  links = glinks
+    .selectAll()
     .data(graph.links)
     .enter().append("line")
       .attr("stroke-width", function(d) {
@@ -412,22 +415,17 @@ const drawSNA = (graph) => {
         //return Math.sqrt(d.value);
       });
 
-  var gnodes = svg.append("g")
-      .attr("class", "nodes");
+  var gnodes = svg.append("g").attr("class", "nodes");
 
-  var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){ return d.id; });
+  var node = gnodes.selectAll("g.node").data(graph.nodes, function(d){
+    return d.id;
+  });
 
-  var gnode = node.enter().append("g")
-    /*.attr("width", function(d) {
-      return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
-    })
-    .attr("height", function(d) {
-      return nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale);
-    })*/
+  gnode = node.enter().append("g")
     .call(d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended));
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
 
   gnode.append("defs")
     .append("pattern")
@@ -463,56 +461,39 @@ const drawSNA = (graph) => {
     .style("fill", function(d){
       return `url(#image${d.id})`;
     });
+
   gnode.append("text")
-    .attr("dx", 0)
+    .attr("dx", function(d) {
+      return (nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale) / 2).toFixed(1);
+    })
     .attr("dy", function(d) {
       return (nodeHeight * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + 20).toFixed(1);
     })
-    .attr("text-anchor", "start")
+    .attr("text-anchor", "middle")
     .text(function(d) { return d.name; });
 
   gnode.append("title")
     .text(function(d) { return d.name; });
 
-  simulation
-    .nodes(graph.nodes)
+  var simulation = d3.forceSimulation()
+    .force("link",
+      d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; })
+    )
+    .force("collide", d3.forceCollide().radius(
+      function(d) {
+        return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + collideGap;
+      }
+    ).iterations(16))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("x", d3.forceX(0))
+    .force("y", d3.forceY(0))
     .on("tick", ticked);
 
-  simulation.force("link")
+  simulation
+    .nodes(graph.nodes)
+    .force("link")
     .links(graph.links);
-
-  function ticked() {
-    links
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
-
-    gnode
-      .attr("transform", function(d) {
-        const scale = (d.type === 'actor') ? 1 : posterScale;
-        d.x = Math.max(0,
-          Math.min(width - nodeWidthRadius * 2 * scale, d.x - nodeWidthRadius * scale)
-        );
-        d.y = Math.max(0,
-          Math.min(height - nodeHeightRadius * 2 * scale, d.y - nodeHeightRadius * scale)
-        );
-        return "translate(" + d.x + "," + d.y + ")";
-    });
-    /*gnode
-      .attr("x", function(d) {
-        const scale = (d.type === 'actor') ? 1 : posterScale;
-        return d.x = Math.max(0,
-          Math.min(width - nodeWidthRadius * 2 * scale, d.x - nodeWidthRadius * scale)
-        );
-      })
-      .attr("y", function(d) {
-        const scale = (d.type === 'actor') ? 1 : posterScale;
-        return d.y = Math.max(0,
-          Math.min(height - nodeHeightRadius * 2 * scale, d.y - nodeHeightRadius * scale)
-        );
-      });*/
-  }
 
   function dragstarted(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -530,4 +511,24 @@ const drawSNA = (graph) => {
     d.fx = null;
     d.fy = null;
   }
+}
+
+function ticked() {
+  links
+    .attr("x1", function(d) { return d.source.x; })
+    .attr("y1", function(d) { return d.source.y; })
+    .attr("x2", function(d) { return d.target.x; })
+    .attr("y2", function(d) { return d.target.y; });
+
+  //keep node in screen
+  gnode
+    .attr("transform", function(d) {
+      d.x = Math.max(0,
+        Math.min(width - nodeWidthRadius * 2, d.x - nodeWidthRadius)
+      );
+      d.y = Math.max(0,
+        Math.min(height - nodeHeightRadius * 2, d.y - nodeHeightRadius)
+      );
+      return "translate(" + d.x + "," + d.y + ")";
+  });
 }
