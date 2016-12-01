@@ -5,6 +5,7 @@ const minYear = 2000;
 const maxYear = 2016;
 const paradigms = [];
 const posterScale = 1.5;
+const collideGap = 1;
 let nodeScale = 0.7;
 let linkDistance = 480;
 let nodeWidthRadius = nodeWidth * nodeScale / 2;
@@ -388,10 +389,17 @@ const drawSNA = (graph) => {
   //var color = d3.scaleOrdinal(d3.schemeCategory20);
 
   var simulation = d3.forceSimulation()
+      .velocityDecay(0.2)
       .force("link",
-        d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; }))
+        d3.forceLink().distance(linkDistance * nodeScale).id(function(d) { return d.id; })
+      )
       .force("charge", d3.forceManyBody().distanceMin(25).strength(-60))
       .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collide", d3.forceCollide().radius(
+        function(d) {
+          return nodeWidth * nodeScale * ((d.type === 'actor') ? 1 : posterScale) + collideGap;
+        }
+      ).iterations(2));
 
   var glinks = svg.append("g")
       .attr("class", "links");
