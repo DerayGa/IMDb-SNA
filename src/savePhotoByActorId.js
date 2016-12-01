@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const jsdom = require('jsdom');
-var wget = require('wget');
+const request = require('request');
 const fetch = require('node-fetch');
 
 const actors = require('../data/actors.json').actors;
@@ -32,8 +32,17 @@ const checkCompleted = () => {
   }
 };
 
+const download = (uri, filename, callback) => {
+  request.head(uri, (err, res, body) => {
+    //console.log('content-type:', res.headers['content-type']);
+    //console.log('content-length:', res.headers['content-length']);
+
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+  });
+};
+
 const getPhotoById = (actor) => {
-    if(!actor) return;
+  if (!actor) return;
   if (photoList.indexOf(actor.id) > 0) {
     //console.log(actor.name, 'photo existed');
     count--;
@@ -52,15 +61,19 @@ const getPhotoById = (actor) => {
           const $ = window.$;
           const imgSrc = $('img#name-poster').attr('src');
           if (imgSrc) {
-            console.log('found! ', actor.name, `#${idx}`);
-            wget.download(imgSrc, `${photoDir}${actor.id}.jpg`); 
-            
+            download(imgSrc, `${photoDir}${actor.id}.jpg`, () => {
+              console.log('found! ', actor.name, `#${idx}`);
+              count--;
+
+              checkCompleted();
+            });
+
           } else {
             console.log('NOT found! ', actor.name, `#${idx}`);
-          }
-          count--;
+            count--;
 
-          checkCompleted();
+            checkCompleted();
+          }
         }
       )
     });
@@ -68,6 +81,6 @@ const getPhotoById = (actor) => {
 
 var idx = 0;
 getPhotoById(actors[idx]);
-getPhotoById(actors[idx++]);
-getPhotoById(actors[idx++]);
-getPhotoById(actors[idx++]);
+getPhotoById(actors[++idx]);
+getPhotoById(actors[++idx]);
+getPhotoById(actors[++idx]);

@@ -2,9 +2,9 @@
 http://www.imdb.com/
 
 ## IMDb API
-http://imdb.wemakesites.net/
-https://github.com/worr/node-imdb-api
-https://www.omdbapi.com/
+http://imdb.wemakesites.net/  
+https://github.com/worr/node-imdb-api  
+https://www.omdbapi.com/  
 
 JSON format
 
@@ -40,3 +40,9 @@ JSON format
   ]
 }
 ```
+
+## Movie
+### 1301
+
+## Actor
+### 3805

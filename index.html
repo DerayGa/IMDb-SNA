@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>IMDb Social Network Analysis</title>
-<link rel="stylesheet" type="text/css" href="./css/normalize.css">
-<link rel="stylesheet" href="./css/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="./css/lib/normalize.css">
+<link rel="stylesheet" href="./css/lib/jquery-ui.css">
+<link rel="stylesheet" href="./css/lib/ui.switchbutton.min.css">
 <link rel="stylesheet" href="./css/sna.css">
 
-<script src="./js/jquery.min.js"></script>
-<script src="./js/jquery-ui.min.js"></script>
-<script src="./js/d3/d3.min.js"></script>
+<script src="./js/lib/jquery.min.js"></script>
+<script src="./js/lib/jquery-migrate-1.2.1.js"></script>
+<script src="./js/lib/jquery.tmpl.min.js"></script>
+<script src="./js/lib/jquery-ui.min.js"></script>
+<script src="./js/lib/jquery.switchbutton.min.js"></script>
+<script src="./js/lib/d3.min.js"></script>
 <script src="./js/loadJSON.js"></script>
 <script src="./js/dataGenerator.js"></script>
 <script src="./js/moviesFilter.js"></script>
@@ -40,6 +44,10 @@
       </select>
     </div>
   </header>
+  <div class="svgContainer"></div>
+  <div class="checkbox-container">
+    <input type="checkbox" class="common" checked="checked" />
+  </div>
   <footer>
     <div class="ui-widget">
       <label>Size:</label>
@@ -57,7 +65,6 @@
   </footer>
   <label id="condition"></label>
   <label id="resultInfo"></label>
-  <svg width="640" height="480"></svg>
 </body>
 
 <script>
