@@ -35,6 +35,8 @@ movies.forEach((movie) => {
   let poster = 'noPoster.jpg';
   if (posterList.indexOf(movie.imdbid) > 0) {
     poster = `${movie.imdbid}.jpg`;
+  } else {
+    console.log('poster not found', movie.title, movie.imdbid);
   }
 
   movie.photo = poster;
@@ -79,10 +81,35 @@ const getPosterById = (movie) => {
       checkCompleted();
     });
   } else {
-    console.log('NOT found! ', movie.title, `#${idx}`);
-    count--;
+    //parse poster from web
+    var posterUrl = `http://www.imdb.com/title/${movie.imdbid}/`;
+    fetch(posterUrl)
+        .then((res) => (
+          res.text()
+        )).then((body) => {
+          jsdom.env(
+            body,
+            ["http://code.jquery.com/jquery.js"],
+            (err, window) => {
+              const $ = window.$;
+              const imgSrc = $('div.poster img').attr('src');
+              if (imgSrc) {
+                download(imgSrc, `${posterDir}${movie.imdbid}.jpg`, () => {
+                  console.log('found! ', movie.title, `#${idx}`);
+                  count--;
 
-    checkCompleted();
+                  checkCompleted();
+                });
+
+              } else {
+                console.log('NOT found! ', movie.title, `#${idx}`);
+                count--;
+
+                checkCompleted();
+              }
+            }
+          )
+        });
   }
 };
 
