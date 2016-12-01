@@ -19,6 +19,31 @@ const posterList = fs.readdirSync(posterDir)
     return (stats.isFile() && path.extname(filename) === '.jpg');
   }).map((name) => (name.replace('.jpg', '')));
 
+//--
+/*
+const saveToJSON = () => {
+  fs.writeFile(`${rootDir}movies.json`,
+    JSON.stringify(movies, null, 2), (err) => {
+    if (err) {
+      return console.error(err);
+    }
+  });
+};
+
+
+movies.forEach((movie) => {
+  let poster = 'noPoster.jpg';
+  if (posterList.indexOf(movie.imdbid) > 0) {
+    poster = `${movie.imdbid}.jpg`;
+  }
+
+  movie.photo = poster;
+});
+saveToJSON();
+
+return;*/
+//--
+
 const checkCompleted = () => {
   if( count == 0) {
     console.log(`allMovies with Poster Saved.`);
