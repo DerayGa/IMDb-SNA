@@ -17,6 +17,7 @@ let graph;
 let allMovies;
 let allActors;
 let fadeOutFlag;
+let mode = '1mode';
 
 const createCondition = () => {
   const searchCondition = {};
@@ -48,8 +49,9 @@ const createCondition = () => {
 const searchAndReload = (condition) => {
   var result = filterBy(condition, allMovies);
 
-  //graph = dataGenerator(result, allActors);
-  graph = dataGenerator2mode(result, allActors);
+  graph = (mode == '1mode')
+    ? dataGenerator(result, allActors)
+    : dataGenerator2mode(result, allActors);
 
   reload();
 }
@@ -103,7 +105,11 @@ const initModeCheckButton = () => {
   $(".common:checkbox").switchbutton({
     checkedLabel: '1 mode',
     uncheckedLabel: '2 mode'
-  });
+  })
+  .change(function(){
+    mode = $(this).prop("checked") ? '1mode' : '2mode';
+    showCondition();
+  });;
 }
 
 const initYearOptions = () => {
@@ -383,8 +389,7 @@ $(() => {
       })
       availableDirector.sort();
 
-      //condition = paradigms[Math.floor(Math.random() * paradigms.length)].value;
-      condition = paradigms[1].value;
+      condition = paradigms[Math.floor(Math.random() * paradigms.length)].value;
 
       initModeCheckButton();
       initYearOptions();
