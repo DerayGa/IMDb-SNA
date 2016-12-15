@@ -110,7 +110,7 @@ const initModeCheckButton = () => {
     mode = $(this).prop("checked") ? '1mode' : '2mode';
     $("#condition").text(`🖇 ${mode}`);
     showCondition();
-  });;
+  });
 }
 
 const initYearOptions = () => {
