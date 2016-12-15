@@ -3,7 +3,7 @@ body {
   overflow: hidden;
 }
 .links line {
-  stroke: #999;
+  stroke: #000;
   stroke-opacity: 0.6;
 }
 
@@ -103,7 +103,7 @@ label#resultInfo{
   left:10px;
   width:80px;
   color: #616161;
-  font-size: 50px;
+  font-size: 26px;
   text-align: left;
   font-weight: bold;
   white-space: pre-wrap

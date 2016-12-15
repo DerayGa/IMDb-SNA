@@ -6,7 +6,7 @@ const maxYear = 2016;
 const paradigms = [];
 const posterScale = 1.5;
 const collideGap = 1;
-let nodeScale = 0.7;
+let nodeScale = 0.6;
 let linkDistance = 250;
 let nodeWidthRadius = nodeWidth * nodeScale / 2;
 let nodeHeightRadius = nodeHeight * nodeScale / 2;
@@ -130,7 +130,7 @@ const initYearOptions = () => {
 const initGenreOptions = () => {
   const genres = ['Action', 'Adventure', 'Biography',
           'Comedy', 'Crime', 'Fantasy', 'History',
-          'Horror', 'Music', 'Romance', 'Sci-Fi'];
+          'Horror', 'Music', 'Romance', 'Sci-Fi', 'Animation'];
 
   genres.forEach((genre) => {
      $('#genre').append($("<option></option>")
@@ -202,7 +202,8 @@ const initGenreOptions = () => {
 const initSampleOptions = () => {
   const actors = ['Christian Bale', 'Tom Cruise', 'Robert Downey Jr.',
     'Daniel Radcliffe', 'Heath Ledger', 'Johnny Depp', 'Brad Pitt',
-    'Angelina Jolie'];
+    'Daniel Craig', 'Angelina Jolie', 'Jennifer Lawrence', 'Emma Stone',
+    'Eddie Murphy', 'Kevin Costner', 'Nicolas Cage'];
 
   const oscarsActors = ['Russell Crowe/2000', 'Denzel Washington/2001',
     'Adrien Brody/2002', 'Sean Penn/2003, 2008', 'Jamie Foxx/2004',
@@ -221,7 +222,7 @@ const initSampleOptions = () => {
 
   const topGenre = ['Action', 'Adventure', 'Biography',
           'Comedy', 'Crime', 'Fantasy', 'History',
-          'Horror', 'Music', 'Romance', 'Sci-Fi'];
+          'Horror', 'Music', 'Romance', 'Sci-Fi', 'Animation'];
 
   const rating = 8.0;
 
