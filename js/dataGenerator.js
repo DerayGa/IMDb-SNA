@@ -56,7 +56,6 @@ const dataGenerator = (movies, allActors) => {
       type: 'actor',
     });
   });
-
   movies.forEach((movie, index) => {
     movie.actors.forEach((sourceName) => {
       const source = findActorByName(sourceName);
@@ -86,6 +85,13 @@ const dataGenerator = (movies, allActors) => {
       });
     });
   });
+  movies.sort((a, b) => {
+    return Number(a.year) - Number(b.year);
+  });
+  console.clear();
+  console.log(['\n\n'].concat(movies.map((movie, index) => (
+    `${movie.year} - ${movie.title}`
+  ))).join('\n'));
 
   if (movies.length == 0) {
     $("#condition").text('No movies!');
@@ -172,6 +178,7 @@ const dataGenerator2mode = (movies, allActors) => {
   });
 
   movies.forEach((movie, index) => {
+    console.log(movie.title, movie.year);
     movie.actors.forEach((actorName) => {
       const target = findActorByName(actorName);
       if (!target.photo)
@@ -180,6 +187,13 @@ const dataGenerator2mode = (movies, allActors) => {
         graph.links.push({ source: movie.imdbid, target: target.id, value: 2});
     });
   });
+  movies.sort((a, b) => {
+    return Number(a.year) - Number(b.year);
+  });
+  console.clear();
+  console.log(['\n\n'].concat(movies.map((movie, index) => (
+    `${movie.year} - ${movie.title}`
+  ))).join('\n'));
 
   if (movies.length == 0) {
     $("#condition").text('No movies!');
