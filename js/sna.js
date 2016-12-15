@@ -108,6 +108,7 @@ const initModeCheckButton = () => {
   })
   .change(function(){
     mode = $(this).prop("checked") ? '1mode' : '2mode';
+    $("#condition").text(`🖇 ${mode}`);
     showCondition();
   });;
 }
